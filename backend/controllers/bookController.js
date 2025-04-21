@@ -1,8 +1,24 @@
 const Book = require("../models/Book");
 
-exports.getBooks = async (req, res) => { 
-    const books = await Book.find({ userId: req.user.id}).sort({ createdAt: -1 });
-    res.json(books);
+exports.getAllBooks = async (req, res) => { 
+    try{
+        const books = await Book.find({ userId: req.user.id}).sort({ createdAt: -1 });
+        res.json(books);
+    } catch (error) {   
+        console.error(error);
+        res.status(500).json({ message: "Erreur lors de la récupération des livres" });
+    }
+};
+
+exports.getBookById = async (req, res) => {
+    try{
+        const book = await Book.findById({_id: req.params.id, userId: req.user.id});
+        if (!book) return res.status(404).json({ message: "Livre introuvable" });
+        res.json(book);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erreur lors de la récupération du livre" });
+    }
 };
 
 exports.createBook = async (req, res) => {
@@ -19,13 +35,19 @@ exports.createBook = async (req, res) => {
 };
 
 exports.updateBook = async (req, res) => {
-    const book = await Book.findById(
-        { _id : req.params.id, userId: req.user.id },
-        req.body,
-        { new: true }
-    );
-    if (!book) return res.status(404).json({ message: "Livre introuvable" });
-    res.json(book);
+    try{
+        const book = await Book.findByIdAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            req.body,
+            { new: true }
+        );
+            
+        if (!book) return res.status(404).json({ message: "Livre introuvable" });
+        res.json(book);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erreur lors de la mise à jour du livre" });
+    }
 };
 
 exports.deleteBook = async (req, res) => {

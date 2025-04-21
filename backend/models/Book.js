@@ -28,9 +28,9 @@ const bookSchema = new mongoose.Schema({
         required: true,
     },
     createdAt: {
-        type: Date,
-        default: Date.now,
+        type: String,
+        default: () => new Date().toLocaleDateString('fr-FR'),
     },
- });
+});
 
  module.exports = mongoose.model("Book", bookSchema);

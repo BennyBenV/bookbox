@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const bookRoutes = require("./routes/bookRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,7 @@ mongoose.connect(uri)
 
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/search", searchRoutes); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

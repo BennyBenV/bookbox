@@ -6,6 +6,9 @@ const bookRoutes = require("./routes/bookRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 
 const app = express();
+const cors = require("cors");
+
+app.use(cors({ origin: "http://localhost:5173" })); // autorise uniquement le front React
 app.use(express.json());
 
 const uri = process.env.MONGO_URI;

@@ -9,6 +9,9 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    coverId: {
+        type: Number,
+    },
     status: {
         type: String,
         enum: ['à lire', 'en cours', 'lu'],
@@ -31,6 +34,7 @@ const bookSchema = new mongoose.Schema({
         type: String,
         default: () => new Date().toLocaleDateString('fr-FR'),
     },
-});
+
+}, {strict: true});
 
  module.exports = mongoose.model("Book", bookSchema);

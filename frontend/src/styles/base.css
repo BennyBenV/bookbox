@@ -1,0 +1,79 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600&display=swap');
+
+/* Reset + base typographique */
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    background-color: #FAF8F4;
+    color: #2C2C2C;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    color:#2C2C2C;
+    margin-bottom: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: #3B5BA5;
+}
+
+a:hover{
+    color: #5E7ED3;
+}
+
+button {
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+ul{
+    list-style: none;
+    padding: 0;
+}
+
+input, textarea, select {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #3B5BA5;
+    box-shadow: 0 0 0 2px rgba(59, 91, 165, 0.2);
+}
+
+/* Buttons */
+button {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: transparent;
+    color: #3B5BA5;
+    border: 1px solid #3B5BA5;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  button:hover {
+    background-color: #3B5BA5;
+    color: #fff;
+  }
+  

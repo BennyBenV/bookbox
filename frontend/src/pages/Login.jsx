@@ -2,11 +2,13 @@ import { useState } from "react";
 import { loginUser } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const { login }= useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -14,6 +16,7 @@ export default function Login() {
             const token = await loginUser(email, password);
             login(token); // Met à jour le contexte d'authentification
             // localStorage.setItem("token", token);
+            navigate("/");
             alert("Connexion réussie");
         }catch(err){
             console.error(err);

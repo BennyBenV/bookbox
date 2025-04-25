@@ -13,6 +13,8 @@ import Stats from './pages/Stats';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
+import Home from './pages/Home';
+import SearchResults from './pages/SearchResults';
 
 export default function App() {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -23,7 +25,7 @@ export default function App() {
 
       <Header />
       <Routes>
-        <Route path="/" element={ isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" /> } />
+        {/* <Route path="/" element={ isAuthenticated ? <Navigate to="/" /> : <Navigate to="/login" /> } /> */}
 
         { /* Pages publiques */}
         <Route path="/register" element={<Register />} />
@@ -36,6 +38,10 @@ export default function App() {
         <Route path="/book/:olid" element={<ProtectedRoute><AppLayout><BookDetails /> </AppLayout></ProtectedRoute>} />
         <Route path="/books/:id" element={<ProtectedRoute><AppLayout><BookPage /></AppLayout></ProtectedRoute>} />
         <Route path="/stats" element={<ProtectedRoute><AppLayout><Stats /></AppLayout> </ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><AppLayout><Home /></AppLayout> </ProtectedRoute>} />
+        <Route path="/results" element={<ProtectedRoute><AppLayout><SearchResults /></AppLayout> </ProtectedRoute>} />
+
+        { /* Redirection */}
       </Routes>
     </>
   )

@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import "../styles/Header.css";
+import "../styles/components/Header.css";
 
 export default function Header() {
     const { isAuthenticated, logout } = useContext(AuthContext);
+    const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -19,11 +20,16 @@ export default function Header() {
                 <Link to="/">📚 Bookbox </Link>
             </div>
 
-            <nav className="nav">
+            <button className="burger" onClick={() => setMenuOpen(!menuOpen)} aria-label="menu">
+                ☰
+            </button>
+
+            <nav className={`nav ${menuOpen ? "open" : ""}`}>
                 {isAuthenticated ? (
                     <>
+                        <Link to="/">Accueil</Link>
                         <Link to="/dashboard">Ma Bibliothèque</Link>
-                        <Link to="/search">Rechercher un livre</Link>
+                        {/* <Link to="/search">Rechercher un livre</Link> */}
                         <Link to="/stats">Statistiques</Link>
                         <button onClick={handleLogout}>Déconnexion</button>
                     </>

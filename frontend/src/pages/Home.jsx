@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getBooks, getStats } from "../services/bookService";
 import SearchBar from "../components/SearchBar";
+import "../styles/pages/Home.css";
 
 export default function Home() {
     const { token } = useContext(AuthContext);
@@ -29,16 +30,16 @@ export default function Home() {
 
 
     return(
-        <div>
+        <div className="home">
             <h1> Bienvenue sur BookBox 📚</h1>
-            <p>Commencez une nouvelle lecture ou poursuivez vos livres en cours !</p>
+            <p className="intro">Commencez une nouvelle lecture ou poursuivez vos livres en cours !</p>
 
-            <div style={{ margin: "2rem 0"}}>
+            <div className="search-section">
                 <SearchBar />
             </div>
 
             {stats && (
-                <div style={{marginBottom: "2rem"}}>
+                <div className="stats">
                     <h2> Mes Statistiques </h2>
                     <p>Total : {stats.total} livres</p>
                     <p>À lire : {stats.aLire} | En cours : {stats.enCours} | Lus : {stats.lus}</p>
@@ -47,7 +48,7 @@ export default function Home() {
             )}
 
             {enCours.length > 0 && (
-                <div> 
+                <div className="book-section"> 
                     <h2> En cours de lecture </h2>
                     <ul>
                         {enCours.map((b) => (
@@ -58,7 +59,7 @@ export default function Home() {
             )}
 
             {topRated.length > 0 && (
-                <div> 
+                <div className="book-section">  
                     <h2> Mes livres préférés </h2>
                     <ul>
                         {topRated.map((b) => (

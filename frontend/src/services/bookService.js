@@ -41,6 +41,26 @@ export const getStats = async () => {
     const res = await axios.get(`${API}/books/stats`, authHeaders());
     return res.data;
 }
+
+export const getAverageRating = async (olid) => {
+    const res = await axios.get(`${API}/books/average/${olid}`);
+    return res.data;
+}
+
+export const getPublicReviews = async (olid) => {
+    const res = await axios.get(`${API}/books/reviews/${olid}`);
+    return res.data
+}
+
+export const getEditionInfo = async (olid) => {
+    const res = await axios.get(`https://openlibrary.org/works/${olid}/editions.json?limit=1`);
+    const entry = res.data.entries?.[0];
+    return{
+        publishDate: entry.publish_date || null,
+        publisher: entry.publishers?.[0] || null
+    }
+}
+
 // export const debugCreateBook = async (bookData) => {
 //     const res = await axios.post(`${API}/books/debug`, bookData, authHeaders());
 //     return res.data;

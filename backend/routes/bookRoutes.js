@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/authMiddleware'); // Middleware d'authentification
-const {getAllBooks, getBookById, createBook, updateBook, deleteBook, debugCreateBook, getStats} = require('../controllers/bookController');
+const {getAllBooks, getBookById, createBook, updateBook, deleteBook, debugCreateBook, getStats, getAverageRating, getPublicReviews} = require('../controllers/bookController');
 const authMiddleware = require('../middleware/authMiddleware');
+
+
+router.get('/average/:olid', getAverageRating); // Récupère la moyenne des notes
+router.get('/reviews/:olid', getPublicReviews);
 
 router.use(auth); // protège toutes les routes
 

@@ -34,6 +34,10 @@ const bookSchema = new mongoose.Schema({
         type: String,
         default: () => new Date().toLocaleDateString('fr-FR'),
     },
+    olid: {
+        type: String,
+    },
+    
 
 }, {strict: true});
 

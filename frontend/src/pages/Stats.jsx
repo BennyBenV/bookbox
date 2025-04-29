@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getStats} from "../services/bookService";
+import "../styles/pages/stats.css"
 
 export default function Stats(){
     const [stats, setStats] = useState(null);
@@ -23,14 +24,43 @@ export default function Stats(){
     if (!stats) return <p>Aucune statistique disponible.</p>;
 
     return(
-        <div>
+        <div className="stats-page">
             <h2> Mes statistiques </h2>
-            <p><strong>Total de livres : </strong>{stats.total}</p>
-            <p><strong>Livres à lire : </strong>{stats.aLire}</p>
-            <p><strong>Livres en cours : </strong>{stats.enCours}</p>
-            <p><strong>Livres lus : </strong>{stats.lus}</p>
-            <p><strong>Note moyenne : </strong>{stats.moyenneNote}</p>
-            <p><strong>Top auteurs : </strong>{stats.topAuteurs.join(", ")}</p>
+
+            <div className="stats-grid">
+
+                <div className="stat-card">
+                    <h4>Total de livres </h4>
+                    <p>{stats.total}</p>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Livres à lire  </h4>
+                    <p>{stats.aLire}</p>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Livres en cours  </h4>
+                    <p>{stats.enCours}</p>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Livres lus</h4>
+                    <p>{stats.lus}</p>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Note moyenne</h4>
+                    <p>{stats.moyenneNote}</p>
+                </div>
+
+                {/* <div className="stat-card">
+                    <h4>Top auteurs</h4>
+                    <p>{stats.topAuteurs.join(", ")}</p>
+
+                </div> */}
+
+            </div>
         </div>
     )
 

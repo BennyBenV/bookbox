@@ -1,0 +1,113 @@
+.book-details{
+    display: grid;
+    grid-template-columns: 200px 1fr 300px;
+    gap: 2rem;
+    padding: 2rem;
+    align-items: start;
+}
+
+.book-cover-large{
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.book-main{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.book-main h1{
+    font-size: 1.6rem;
+    font-family: 'Lora', serif;
+    margin-bottom: 0.5rem;
+}
+
+.book-main .authors{
+    color: #555;
+    font-style: italic;
+}
+
+.book-main .desc{
+    line-height: 1.6;
+}
+
+.book-main .avg-rating{
+    font-size: 1rem;
+    color: #6b4e2f;
+    background: #f5f1ec;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.user-zone{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: #f9f6f3;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.06);
+}
+
+.book-reviews-wrapper {
+    grid-column: 1 / -1; /* occupe toute la grille 1 / -1 = de la 1ere colonne à la dernière colonne de la grille */
+    width: 100%;
+    padding: 2rem;
+    background: #f9f6f2;
+    margin-top: 2rem;
+  }
+  
+.public-reviews {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+.review-item {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+.review-item strong {
+    color: #5e3c2c;
+  }
+
+.genres{
+    margin: 0.5rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.genre{
+    background : #f3eee9;
+    color: #5c4633;
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+  
+
+
+@media(max-width: 768px){
+    .book-details{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-cover-large{
+        align-self: center;
+        max-width: 60%;
+        margin-bottom: 1rem;
+    }
+
+    .user-zone{
+        width: 100%;
+    }
+}

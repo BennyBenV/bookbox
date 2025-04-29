@@ -76,7 +76,7 @@ export default function Dashboard() {
             
             <div className="filters">
                 {filters.map((f) => (
-                    <button key={f} onClick= {() => setStatusFilter(f.value)} className={statusFilter === f ? "active" : ""}>
+                    <button key={f.value} onClick= {() => setStatusFilter(f.value)} className={statusFilter === f.value ? "active" : ""}>
                         {f.label}
                     </button>
                 ))}
@@ -87,7 +87,7 @@ export default function Dashboard() {
             ) : (
                 <div className="book-list">
                     {filteredBooks.map((book) => (
-                        <div className="book-card" key={book._id} onClick={() => navigate(`/books/${book._id}`)}>
+                        <div className="book-card" key={book._id} onClick={() => navigate(`/book/${book.olid}`)}>
                             {book.coverId ? (
                                 <img src={`https://covers.openlibrary.org/b/id/${book.coverId}-S.jpg`} alt="Cover" className="book-cover" />
                             ) : (
@@ -104,8 +104,12 @@ export default function Dashboard() {
                             </div>
 
                             <div className="book-actions">
-                                <button onClick={() => navigate(`/books/${book._id}`)}>Voir fiche</button>
-                                <button onClick={() => handleDelete(book._id)}>Supprimer</button>
+                                <button onClick={(e) => {e.stopPropagation(); navigate(`/book/${book.olid}`); console.log(book.olid);}}>
+                                    Voir fiche
+                                </button>
+                                <button onClick={(e) => {e.stopPropagation(); handleDelete(book._id);}}> { /*⛔ bloque la redirection du parent*/}
+                                    Supprimer
+                                </button>
                             </div>
                         </div>
                     ))}

@@ -22,7 +22,7 @@ exports.getBookById = async (req, res) => {
 };
 
 exports.createBook = async (req, res) => {
-    const { title, author, status, rating, review, coverId } = req.body;
+    const { title, author, status, rating, review, coverId, olid } = req.body;
     const book = await Book.create({
         title,
         author,
@@ -30,6 +30,7 @@ exports.createBook = async (req, res) => {
         rating,
         review,
         coverId,
+        olid,
         userId: req.user.id,
     });
 
@@ -93,6 +94,27 @@ exports.getStats= async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la récupération des statistiques" });
     }
 }
+
+exports.getAverageRating = async (req,res) => {
+    const {olid} = req.params;
+
+    try{
+        //Récupère tous les livres ayant ce même OLID
+        const books = await Book.find({olid, rating: {$gt: 0} });
+
+        if (books.length === 0 ){
+            return res.json({average: null, count: 0});
+        }
+        const total = books.reduce((sum,b) => sum + b.rating, 0);
+        const average = total / books.length;
+
+        res.json({ average: Number(average.toFixed(2)), count: books.length });
+    }catch(error){
+        console.error("Erreur calcul moyenne note : ", error);
+        res.status(500).json({ message : "Erreur lors du calcul de la moyenne." })
+    }
+}
+
 
 
 

@@ -61,6 +61,11 @@ export const getEditionInfo = async (olid) => {
     }
 }
 
+export const getTrending = async () => {
+    const res = await axios.get(`${API}/books/trending`);
+    return res.data;
+}
+
 // export const debugCreateBook = async (bookData) => {
 //     const res = await axios.post(`${API}/books/debug`, bookData, authHeaders());
 //     return res.data;

@@ -1,22 +1,29 @@
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { getBooks, getStats } from "../services/bookService";
+import { getBooks, getStats, getTrending } from "../services/bookService";
 import SearchBar from "../components/SearchBar";
+import { getDiscoverBooks } from "../services/searchServices";
+
 import "../styles/pages/Home.css";
 
 export default function Home() {
     const { token } = useContext(AuthContext);
     const [books, setBooks] = useState([]);
     const [stats, setStats] = useState(null);
+    const [discover, setDiscover] = useState([]);
+    const [trending, setTrending] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try{
-                const [booksData, statsData] = await Promise.all([getBooks(), getStats()]);
+                const [booksData, statsData, discoverData, trendingData] = await Promise.all([getBooks(), getStats(), getDiscoverBooks(), getTrending()]);
                 setBooks(booksData);
                 setStats(statsData);
+                setDiscover(discoverData)
+                setTrending(trendingData)
+
             }catch(err){
                 console.error(err);
                 alert("Erreur lors de la récupération des données !");
@@ -27,6 +34,20 @@ export default function Home() {
 
     const topRated = books.filter((book) => book.rating >= 4);
     const enCours = books.filter((book) => book.status === "En cours");
+    const recentlyAdded = [...books].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,3);
+
+    const handleClick = (olid) => {
+        if(olid) navigate(`/book/${olid}`);
+    }
+
+    const renderBook = (book) => (
+        <li key={book._id} onClick={() => handleClick(book.olid)}>
+            {book.coverId && (
+                <img src={`https://covers.openlibrary.org/b/id/${book.coverId}-S.jpg`} alt="Cover" className="book-cover-sm" />
+            )}
+            <span>{book.title} {book.rating && <>({book.rating}/5)</>} - {book.author}</span>
+        </li>
+    )
 
 
     return(
@@ -38,36 +59,76 @@ export default function Home() {
                 <SearchBar />
             </div>
 
+            {trending.length > 0 && (
+                <div className="section">
+                    <h2>🔥 Livres en tendances</h2>
+                    <div className="book-grid">
+                        {trending.map((b) => (
+                            <div key={b._id} className="book-card-grid" onClick={() => navigate(`/book/${b.olid}`)}>
+                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" />
+                                <div className="book-title">{b.title}</div>
+                                <div className="book-author">{b.author}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+
+
             {stats && (
-                <div className="stats">
+                <div className="section stats">
                     <h2> Mes Statistiques </h2>
-                    <p>Total : {stats.total} livres</p>
-                    <p>À lire : {stats.aLire} | En cours : {stats.enCours} | Lus : {stats.lus}</p>
-                    <p> Note Moyenne : {stats.moyenneNote} </p>
+                    <p>📘 Total : {stats.total} livres</p>
+                    <p>📖 À lire : {stats.aLire} | ⏳ En cours : {stats.enCours} | ✅ Lus : {stats.lus} </p>
+                    <p>⭐ Note moyenne : {stats.moyenneNote}/5</p>
                 </div>
             )}
 
             {enCours.length > 0 && (
-                <div className="book-section"> 
-                    <h2> En cours de lecture </h2>
+                <div className="section current-reading"> 
+                    <h2>📚 Lecture actuelle</h2>
                     <ul>
-                        {enCours.map((b) => (
-                            <li key={b._id}>{b.title} - {b.author}</li>
-                        ))}
+                        {enCours.map(renderBook)}
                     </ul>
                 </div>
             )}
 
             {topRated.length > 0 && (
-                <div className="book-section">  
-                    <h2> Mes livres préférés </h2>
+                <div className="section favorites">  
+                    <h2>❤️ Mes livres préférés </h2>
                     <ul>
-                        {topRated.map((b) => (
-                            <li key={b._id}>{b.title} - {b.rating}/5</li>
-                        ))}
+                        {topRated.map(renderBook)}
                     </ul>
                 </div>
             )}
+
+            
+            {discover.length > 0 && (
+                <div className="section discover">
+                    <h2>🎯 Découvrir</h2>
+                    <div className="book-grid">
+                        {discover.map((b,i) => (
+                            <div key={i} className="book-card-grid" onClick={() => navigate(`/book/${b.olid}`)}>
+                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" />
+                                <div className="book-title">{b.title}</div>
+                                <div className="book-author">{b.author}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* {recentlyAdded.length > 0 && (
+                <div className="book-section">
+                    <h2> Derniers ajouts</h2>
+                    <ul>
+                        {recentlyAdded.map(renderBook)}
+                    </ul>
+                </div>
+            )} */}
+
+
         </div>
     )
 }

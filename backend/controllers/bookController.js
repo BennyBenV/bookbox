@@ -115,7 +115,37 @@ exports.getAverageRating = async (req,res) => {
     }
 }
 
+exports.getPublicReviews = async (req,res) => {
+    try{
+        const { olid } = req.params;
+        const reviews = await Book.find({
+            olid,
+            review: { $exists: true, $ne: ""}
+        }).select("review rating author")
 
+        res.json(reviews);
+    }catch(error){
+        console.error("Erreur getPublicReviews : ", error);
+        res.status(500).json({message: "Erreur lors de la récupération des reviews."});
+    }
+}
+
+exports.getTrendingBooks = async (req,res) => {
+    try{
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() -7);
+
+        const trending = await Book.find({
+            rating: {$gt : 0},
+            updatedAt: { $gte : sevenDaysAgo}
+        }).sort({updatedAt: -1, rating: -1}).limit(10);
+
+        res.json(trending);
+    }catch(err){
+        console.error("Erreur tendances : ", err);
+        res.status(500).json({message: "Erreur récupération des livres tendances"});
+    }
+}
 
 
 

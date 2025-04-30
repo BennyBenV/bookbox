@@ -30,15 +30,20 @@ const bookSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    createdAt: {
-        type: String,
-        default: () => new Date().toLocaleDateString('fr-FR'),
-    },
+    // createdAt: {
+    //     type: String,
+    //     default: () => new Date().toLocaleDateString('fr-FR'),
+    // },
     olid: {
         type: String,
     },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+    },
+
     
 
-}, {strict: true});
+}, {strict: true, timestamps: true});
 
  module.exports = mongoose.model("Book", bookSchema);

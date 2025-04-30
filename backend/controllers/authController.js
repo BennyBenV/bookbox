@@ -2,6 +2,11 @@ const bycrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+    return regex.test(password);
+}
+
 exports.register = async (req, res) => {
     const {email, password} = req.body;
     try{

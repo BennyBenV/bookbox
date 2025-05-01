@@ -3,34 +3,44 @@ import { loginUser } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/pages/auth.css";
+import { toast } from "react-toastify";
 
 export default function Login() {
     const { login }= useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
         try{
-            const token = await loginUser(email, password);
-            login(token); // Met à jour le contexte d'authentification
-            // localStorage.setItem("token", token);
+            const {token, user} = await loginUser(email, password);
+            login(token, user); // Met à jour le contexte d'authentification
             navigate("/");
-            alert("Connexion réussie");
+            toast.success("Connexion réussie !");
+            // alert("Connexion réussie");
         }catch(err){
             console.error(err);
-            alert("Erreur lors de la connexion !");
+            const msg = err?.response?.data?.message || "Erreur lors de la connexion.";
+            setError(msg);
+            toast.error("Connexion échoué !");
+            // alert("Erreur lors de la connexion !");
         }
     };
 
     return(
-        <form onSubmit={handleLogin}>
-            <h2>Connexion</h2>
-            <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
-            <input type="password" placeholder="Mot de passe" onChange={(e) => setPassword(e.target.value)} required />
-            <button type="submit">Se connecter</button>
-        </form>
+        <div className="auth-container">
+            <form onSubmit={handleLogin}>
+                <h2>Connexion</h2>
+                <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+                <input type="password" placeholder="Mot de passe" onChange={(e) => setPassword(e.target.value)} required />
+                {error && <div className="auth-error">{error}</div>}
+                <button type="submit">Se connecter</button>
+            </form>
+        </div>
 
     )
 }

@@ -3,6 +3,7 @@ import { getBooks, deleteBook } from '../services/bookService';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import "../styles/pages/dashboard.css";
+import { toast } from 'react-toastify';
 
 export default function Dashboard() {
     const { isAuthenticated } = useContext(AuthContext);
@@ -10,6 +11,8 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all"); // "all", "read", "unread"
     const [searchTerm, setSearchTerm] = useState("");
+    const [sortOption, setSortOption] = useState("recent");
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,6 +33,7 @@ export default function Dashboard() {
 
     }, [isAuthenticated]);
 
+
     const handleDelete = async (id) => {
         if(!confirm("Êtes-vous sûr de vouloir supprimer ce livre ?")) return;
         try{
@@ -37,7 +41,7 @@ export default function Dashboard() {
             setBooks(books.filter((b) => b._id !== id));
         }catch(err){
             console.error("Erreur lors de la suppression :", err);
-            alert("Erreur lors de la suppression du livre.");
+            toast.error("Erreur lors de la suppression du livre.");
         }
     }
 
@@ -60,6 +64,22 @@ export default function Dashboard() {
       { label: "Lu", value: "lu" },
     ];
     
+    const sortBooks = [...filteredBooks].sort((a,b) => {
+        switch (sortOption){
+            case "title-asc":
+                return a.title.localeCompare(b.title);
+            case "title-desc":
+                return b.title.localeCompare(a.title);
+            case "rating":
+                return (b.rating||0) - (a.rating||0);
+            case "recent":
+                return new Date(b.updatedAt) - new Date(a.updatedAt);
+            default:
+                return 0;
+
+        }
+    });
+
     if (!isAuthenticated) {
         return <p>Veuillez vous connecter pour voir le tableau de bord.</p>;
     }
@@ -82,11 +102,21 @@ export default function Dashboard() {
                 ))}
             </div>
 
-            {filteredBooks.length === 0 ? (
+            <div className="sort-select">
+                <label>Trier par : </label>
+                <select value={sortOption} onChange={(e) => {setSortOption(e.target.value);}}>
+                    <option value="recent">Plus récent</option>
+                    <option value="title-asc">Titre A-Z</option>
+                    <option value="title-desc">Titre Z-A</option>
+                    <option value="rating">Note</option>
+                </select>
+            </div>
+
+            {sortBooks.length === 0 ? (
                 <p> Aucun livre trouvé pour ce filtre </p>
             ) : (
                 <div className="book-list">
-                    {filteredBooks.map((book) => (
+                    {sortBooks.map((book) => (
                         <div className="book-card" key={book._id} onClick={() => navigate(`/book/${book.olid}`)}>
                             {book.coverId ? (
                                 <img src={`https://covers.openlibrary.org/b/id/${book.coverId}-S.jpg`} alt="Cover" className="book-cover" />

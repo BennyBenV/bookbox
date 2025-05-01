@@ -17,14 +17,6 @@ const bookSchema = new mongoose.Schema({
         enum: ['à lire', 'en cours', 'lu'],
         default: 'à lire',
     },
-    rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-    },
-    review: {
-        type: String,
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

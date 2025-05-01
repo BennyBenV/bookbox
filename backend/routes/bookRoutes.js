@@ -5,8 +5,6 @@ const {getAllBooks, getBookById, createBook, updateBook, deleteBook, debugCreate
 const authMiddleware = require('../middleware/authMiddleware');
 
 
-router.get('/average/:olid', getAverageRating); // Récupère la moyenne des notes
-router.get('/reviews/:olid', getPublicReviews); // Récupère les reviews dse users
 router.get('/trending', getTrendingBooks); // Livres les mieux notés récemment
 
 router.use(auth); // protège toutes les routes

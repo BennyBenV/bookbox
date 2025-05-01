@@ -41,11 +41,12 @@ export default function Home() {
     }
 
     const renderBook = (book) => (
-        <li key={book._id} onClick={() => handleClick(book.olid)}>
+        <li key={book._id} className="book-card-grid" onClick={() => handleClick(book.olid)}>
             {book.coverId && (
-                <img src={`https://covers.openlibrary.org/b/id/${book.coverId}-S.jpg`} alt="Cover" className="book-cover-sm" />
+                <img src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`} alt="Cover" className="book-cover-sm" loading="lazy" width="160" height="240"/>
             )}
-            <span>{book.title} {book.rating && <>({book.rating}/5)</>} - {book.author}</span>
+            <div className="book-title">{book.title}</div>
+            <div className="book-author">{book.author}</div>
         </li>
     )
 
@@ -65,7 +66,7 @@ export default function Home() {
                     <div className="book-grid">
                         {trending.map((b) => (
                             <div key={b._id} className="book-card-grid" onClick={() => navigate(`/book/${b.olid}`)}>
-                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" />
+                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" loading="lazy" width="160" height="240" />
                                 <div className="book-title">{b.title}</div>
                                 <div className="book-author">{b.author}</div>
                             </div>
@@ -110,7 +111,7 @@ export default function Home() {
                     <div className="book-grid">
                         {discover.map((b,i) => (
                             <div key={i} className="book-card-grid" onClick={() => navigate(`/book/${b.olid}`)}>
-                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" />
+                                <img src={`https://covers.openlibrary.org/b/id/${b.coverId}-M.jpg`} alt="Couverture" loading="lazy" width="160" height="240"/>
                                 <div className="book-title">{b.title}</div>
                                 <div className="book-author">{b.author}</div>
                             </div>

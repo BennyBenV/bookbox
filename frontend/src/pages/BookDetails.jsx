@@ -2,9 +2,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios, { all } from "axios";
 import { AuthContext } from "../context/AuthContext";
-import { getBooks, createBook, getAverageRating, getPublicReviews, getEditionInfo} from "../services/bookService";
+import { getBooks, createBook, getEditionInfo} from "../services/bookService";
+import { getAverageRating, getPublicReviews } from "../services/reviewService";
 import BookFormCard from "../components/BookFormCard";
 import "../styles/pages/BookDetails.css";
+const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
 export default function BookDetails() {
   const { olid } = useParams(); //ID Open Library
@@ -16,7 +18,7 @@ export default function BookDetails() {
   const [ loading, setLoading] = useState(true);
   const [ userBook, setUserBook] = useState(null);
   const [avgRating, setAvgRating] = useState(null);
-  const [publicReviews, setPublicReviews] = useState();
+  const [publicReviews, setPublicReviews] = useState([]);
   const [genres, setGenres] = useState([]);
 
   // Normalisation pour comparer les titres
@@ -108,6 +110,9 @@ export default function BookDetails() {
           src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
           alt="Couverture"
           className="book-cover-large"
+          loading="eager" 
+          width="400" 
+          height="600"
         />
       )}
 
@@ -155,12 +160,19 @@ export default function BookDetails() {
         {publicReviews.length > 0 && (
           <div className="public-reviews">
             <h3> Avis des lecteurs </h3>
-            {publicReviews.map((r,i) => (
+            {publicReviews.map((r, i) => (
               <div key={i} className="review-item">
-                <p><strong>{r.author}</strong>{" "}{r.rating > 0 && <>- {r.rating}/5</>}</p>
+                <div className="review-header">
+                  {r.avatar && (
+                    <img src={`${MEDIA}${r.avatar}`} alt="avatar" className="review-avatar" />
+                  )}
+                  <strong>{r.user}</strong>{" "}
+                  {r.rating > 0 && <> - {r.rating}/5</>}
+                </div>
                 <p>{r.review}</p>
               </div>
             ))}
+
           </div>
         )}
       </div>

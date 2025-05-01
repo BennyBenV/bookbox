@@ -2,6 +2,8 @@ import { useState } from "react";
 import { createBook, updateBook } from "../services/bookService";
 import { useNavigate } from "react-router-dom";
 import "../styles/components/BookFormCard.css"
+import { createOrUpdateReview } from "../services/reviewService";
+import { toast } from "react-toastify";
 
 export default function BookFormCard({ initialData, title, author, coverId, olid, onSuccess }) {
     const [status, setStatus] = useState(initialData?.status || "à lire");
@@ -15,17 +17,19 @@ export default function BookFormCard({ initialData, title, author, coverId, olid
 
         try{
             if(isEdit) {
-                await updateBook(initialData._id, { status, rating, review});
-                alert ("Livre mis à jour avec succès !");
+                await updateBook(initialData._id, { status });
+                await createOrUpdateReview({ olid, rating, review });
+                toast.success("Livre mis à jour avec succès !");
             } else{
-                await createBook({title, author, coverId, status, rating, review, olid});
-                alert ("Livre ajouté avec succès !");
+                await createBook({title, author, coverId, status, olid});
+                await createOrUpdateReview({ olid, rating, review });               
+                toast.success("Livre ajouté avec succès !");
             }
 
             onSuccess?.(); //callback pour BookDetails
         }catch (error) {
             console.error("Erreur lors de la sauvegarde :", error);
-            alert ("Erreur !");
+            toast.error("Erreur !");
         }
         
     }

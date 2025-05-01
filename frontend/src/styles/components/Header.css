@@ -49,10 +49,10 @@
     color: #3B5BA5;
 }
 
-.nav button{
+/* .nav button{
     font-size: 1rem;
     background-color: transparent;
-    border: 1px solid #A54242;
+    border: 1px solid blue;
     color: #A54242;
     cursor: pointer;
     border-radius: 6px;
@@ -63,6 +63,86 @@
 .nav button:hover{
     background-color: #A54242;
     color: #fff;
+} */
+
+.user-menu{
+    position: relative;
+}
+
+.user-icon{
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+.user-dropdown{
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 0.8rem 1rem;
+    width: 200px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+    z-index: 999;
+    
+}
+
+.user-dropdown.open {
+    opacity: 1;
+    transform: translate(0);
+    pointer-events: auto;
+}
+
+.user-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-dropdown-header img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-dropdown p {
+    font-weight: bold;
+    color: #3b5ba5;
+    margin: 0;
+}
+
+.user-dropdown button, .user-dropdown a{
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.4rem 0;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.2 ease;
+}
+
+.user-dropdown button:hover, .user-dropdown a:hover{
+    background-color: #f0f0f0;
+}
+
+.avatar{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
 }
 
 /* Responsive styles */

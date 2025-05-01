@@ -93,7 +93,19 @@
     font-weight: 500;
 }
   
-
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .review-avatar {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
 
 @media(max-width: 768px){
     .book-details{

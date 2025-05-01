@@ -4,6 +4,10 @@ const API = import.meta.env.VITE_API_URL;
 
 const authHeaders = () => {
     const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("No token found — unauthorized");
+    }
+
     return{
         headers: {
             Authorization: `Bearer ${token}`,
@@ -40,16 +44,6 @@ export const updateBook = async (id, book) => {
 export const getStats = async () => {
     const res = await axios.get(`${API}/books/stats`, authHeaders());
     return res.data;
-}
-
-export const getAverageRating = async (olid) => {
-    const res = await axios.get(`${API}/books/average/${olid}`);
-    return res.data;
-}
-
-export const getPublicReviews = async (olid) => {
-    const res = await axios.get(`${API}/books/reviews/${olid}`);
-    return res.data
 }
 
 export const getEditionInfo = async (olid) => {

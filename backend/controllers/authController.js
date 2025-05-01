@@ -8,19 +8,38 @@ const validatePassword = (password) => {
 }
 
 exports.register = async (req, res) => {
-    const {email, password} = req.body;
+    const {email, password, username} = req.body;
     try{
-        const exists = await User.findOne({email});
-        if (exists) {
-            return res.status(400).json({message: "User already exists"});
+        if (!email || !password || !username) {
+            return res.status(400).json({message: "All fields are required."});
         }
 
-        const hashed = await bycrypt.hash(password, 10);
-        const newUser = await User.create({email, password: hashed});
+        if(!validatePassword(password)){
+            return res.status(400).json({message: "Password must be at least 8 characters long, include upper and lower case letters, a number and a special character."});
+        }
 
-        const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
+        const existingEmail = await User.findOne({email});
+        if (existingEmail){
+            return res.status(400).json({message: "Email already in use."});
+        }
 
-        res.status(201).json({token});
+        const existingUsername = await User.findOne({username});
+        if (existingUsername){
+            return res.status(400).json({message: "Usernam already taken."});
+        }
+
+        const hashedPassword = await bycrypt.hash(password, parseInt(process.env.SALT_ROUNDS || '10'));
+
+        const newUser = await User.create({ email, username, password: hashedPassword});
+
+        const token = jwt.sign(
+            { id: newUser._id, username: newUser.username},
+            process.env.JWT_SECRET,
+            {expiresIn: '7d'}
+        );
+
+        res.status(201).json({token, user: {id: newUser._id, email: newUser.email, username: newUser.username,}})
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({message: "Server error"});
@@ -42,7 +61,7 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-        res.json({token});
+        res.json({token, user: {id: user._id, email: user.email, username: user.username}});
     } catch (error) {
         console.error(error);
         res.status(500).json({message: "Server error"});

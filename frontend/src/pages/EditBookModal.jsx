@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getBookById, updateBook } from "../services/bookService";
+import { toast } from "react-toastify";
 
 export default function EditBookModal({ bookId, onClose, onUpdated }) {
     const [book, setBook] = useState(null);
@@ -12,7 +13,7 @@ export default function EditBookModal({ bookId, onClose, onUpdated }) {
                 setBook(data);
             }catch(err){
                 console.error(err);
-                alert("Erreur lors de la récupération du livre.");
+                toast.error("Erreur lors de la récupération du livre.");
             }finally{
                 setLoading(false);
             }
@@ -29,12 +30,12 @@ export default function EditBookModal({ bookId, onClose, onUpdated }) {
         e.preventDefault();
         try{
             await updateBook(bookId, book);
-            alert("Modification enregistrée !");
+            toast.success("Modification enregistrée !");
             onUpdated(); // Callback pour rafraîchir l'affichage parent
             onClose(); // Ferme la modale
         }catch(err){
             console.error(err);
-            alert("Erreur lors de la mise à jour du livre.");
+            toast.error("Erreur lors de la mise à jour du livre.");
         }
     }
 

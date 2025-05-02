@@ -12,6 +12,8 @@ export default function EditProfile() {
     const [avatar, setAvatar] = useState("");
     const [loading, setLoading] = useState(true);
     const { refreshUser } = useContext(AuthContext);
+    const MEDIA = import.meta.env.VITE_MEDIA_URL;
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -98,12 +100,13 @@ export default function EditProfile() {
                     Photo de profil : 
                     <input type="file" accept="image/*" onChange={handleFileUpload} />
                 </label>
-                {/* {avatar && (
+                {avatar && (
                     <div className="preview">
                         <p>Preview : </p>
-                        <img src={`http://localhost:5000${user.avatar}`} alt="Profil" />
+                        <img src={avatar.startsWith("/uploads") ? `${MEDIA}${avatar}` : avatar} alt="avatar" />
                     </div>
-                )} */}
+                )}
+
                 
                 <button type="submit">Enregistrer</button>
                 <button type="button" className="danger" onClick={handleDelete}>Supprimer mon compte</button>

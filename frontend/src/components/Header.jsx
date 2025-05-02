@@ -47,6 +47,7 @@ export default function Header() {
                         <div className="user-menu" ref={dropdownRef}>
                             <button className="user-icon" onClick={() => setDropdownOpen(!dropdownOpen)} aria-label="account">
                                 <img src={user?.avatar ? `${MEDIA}${user.avatar}` : "/default.jpg"} alt="avatar" className="avatar" />
+
                             </button>
 
                             <div className={`user-dropdown ${dropdownOpen ? "open" : ""}`}>

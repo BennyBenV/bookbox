@@ -164,7 +164,7 @@ export default function BookDetails() {
               <div key={i} className="review-item">
                 <div className="review-header">
                   {r.avatar && (
-                    <img src={`${MEDIA}${r.avatar}`} alt="avatar" className="review-avatar" />
+                    <img src={r.avatar ? `${MEDIA}${r.avatar}` : "/default.jpg"} alt="avatar" className="review-avatar" />
                   )}
                   <strong>{r.user}</strong>{" "}
                   {r.rating > 0 && <> - {r.rating}/5</>}

@@ -16,7 +16,15 @@ const allowedOrigins = [
     "https://bookbox-bl5o7moy4-bennybenvs-projects.vercel.app" //prod
 ];
 
-app.use(cors({ origin: "http://localhost:5173" })); // autorise uniquement le front React
+app.use(cors({ 
+    origin: (origin, callback) => {
+        if(!origin || allowedOrigins.includes(origin)){
+            return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+ })); // autorise uniquement le front React
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 app.use(compression());

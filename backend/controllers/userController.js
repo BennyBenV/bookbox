@@ -48,7 +48,7 @@ exports.uploadAvatar = async (req,res) => {
         if(!req.file) return res.status(400).json({message: "Aucun fichier reçu"});
         
         const fileName = req.file.filename;
-        const url = `/uploads/avatars/${fileName}`;
+        const url = `uploads/avatars/${fileName}`;
 
         await User.findByIdAndUpdate(req.user.id, {avatar: url});
 

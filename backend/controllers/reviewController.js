@@ -8,7 +8,7 @@ exports.getReviewsByBook = async (req, res) =>{
             rating : r.rating,
             review : r.review,
             user: r.userId?.username || "Anonymous",
-            avatar: r.userId?.avatar || "/uploads/avatars/default.jpg",
+            avatar: r.userId?.avatar || "uploads/avatars/default.jpg",
             createdAt : r.createdAt
         })));
     }catch(err){

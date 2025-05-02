@@ -33,6 +33,7 @@ export default function BookDetails() {
 
   // Chargement au montage de la page
   useEffect(() => {
+    if(!isAuthenticated) return;
     const fetchData = async () => {
       try{
         const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);

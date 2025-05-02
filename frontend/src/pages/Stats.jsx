@@ -3,10 +3,12 @@ import { getStats} from "../services/bookService";
 import "../styles/pages/stats.css"
 
 export default function Stats(){
+    const { isAuthenticated } = useContext(AuthContext);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if(!isAuthenticated) return;
         const fetchStats = async () => {
             try{
                 const data = await getStats();
@@ -18,7 +20,7 @@ export default function Stats(){
             }
         }
         fetchStats();
-    }, [])
+    }, [isAuthenticated])
 
     if (loading) return <p>Chargement des statistiques...</p>;
     if (!stats) return <p>Aucune statistique disponible.</p>;

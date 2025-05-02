@@ -7,7 +7,7 @@ import { getDiscoverBooks } from "../services/searchServices";
 import "../styles/pages/home.css";
 
 export default function Home() {
-    const { token } = useContext(AuthContext);
+    const { isAuthenticated } = useContext(AuthContext);
     const [books, setBooks] = useState([]);
     const [stats, setStats] = useState(null);
     const [discover, setDiscover] = useState([]);
@@ -15,7 +15,10 @@ export default function Home() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }      
         const fetchData = async () => {
             try{
                 const [booksData, statsData, discoverData, trendingData] = await Promise.all([getBooks(), getStats(), getDiscoverBooks(), getTrending()]);
@@ -26,7 +29,7 @@ export default function Home() {
 
             }catch(err){
                 console.error(err);
-                alert("Erreur lors de la récupération des données !");
+                // alert("Erreur lors de la récupération des données !");
             }
         }
         fetchData();

@@ -16,6 +16,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if(!isAuthenticated) return;
         const fetchBooks = async () => {
             try {
                 const data = await getBooks();

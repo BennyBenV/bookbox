@@ -11,12 +11,13 @@ export default function EditProfile() {
     const [password, setPassword] = useState("");
     const [avatar, setAvatar] = useState("");
     const [loading, setLoading] = useState(true);
-    const { refreshUser } = useContext(AuthContext);
+    const { refreshUser, isAuthenticated } = useContext(AuthContext);
     const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
     const navigate = useNavigate();
 
     useEffect(() => {
+        if(!isAuthenticated) return;
         const fetchUser = async () => {
             try{
                 const data = await getMe();

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState, useRef, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import "../styles/components/header.css";
+import "../styles/components/Header.css";
 
 export default function Header() {
     const MEDIA = import.meta.env.VITE_MEDIA_URL;

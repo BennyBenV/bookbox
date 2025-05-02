@@ -15,6 +15,7 @@ export default function Home() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (!isAuthenticated) return;
         const fetchData = async () => {
             try{
                 const [booksData, statsData, discoverData, trendingData] = await Promise.all([getBooks(), getStats(), getDiscoverBooks(), getTrending()]);
@@ -29,7 +30,7 @@ export default function Home() {
             }
         }
         fetchData();
-    }, []);
+    }, [isAuthenticated]);
 
     const topRated = books.filter((book) => book.rating >= 4);
     const enCours = books.filter((book) => book.status === "En cours");

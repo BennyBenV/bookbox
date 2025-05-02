@@ -13,7 +13,7 @@ const compression = require("compression");
 
 const allowedOrigins = [
     "http://localhost:5173", //local dev
-    "https://bookbox-bl5o7moy4-bennybenvs-projects.vercel.app" //prod
+    "bookbox-pi.vercel.app" //prod
 ];
 
 app.use(cors({ 

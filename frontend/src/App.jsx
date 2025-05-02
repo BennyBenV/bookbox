@@ -35,11 +35,15 @@ export default function App() {
           <Route path="/register" element={<Register />} />
 
           {/* ✅ Pages privées (auth requise) */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AppLayout><Home /></AppLayout>
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/"
+            element={
+              isAuthenticated
+                ? <ProtectedRoute><AppLayout><Home /></AppLayout></ProtectedRoute>
+                : <Navigate to="/login" replace />
+            }
+          />
+
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <AppLayout><Dashboard /></AppLayout>

@@ -11,6 +11,11 @@ const cors = require("cors");
 const path = require("path");
 const compression = require("compression");
 
+const allowedOrigins = [
+    "http://localhost:5173", //local dev
+    "https://bookbox-bl5o7moy4-bennybenvs-projects.vercel.app" //prod
+];
+
 app.use(cors({ origin: "http://localhost:5173" })); // autorise uniquement le front React
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));

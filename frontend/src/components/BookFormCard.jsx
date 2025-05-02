@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createBook, updateBook } from "../services/bookService";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/BookFormCard.css"
+import "../styles/components/bookFormCard.css"
 import { createOrUpdateReview } from "../services/reviewService";
 import { toast } from "react-toastify";
 

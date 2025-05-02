@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getBooks, getStats, getTrending } from "../services/bookService";
 import SearchBar from "../components/SearchBar";
 import { getDiscoverBooks } from "../services/searchServices";
-
-import "../styles/pages/Home.css";
+import "../styles/pages/home.css";
 
 export default function Home() {
     const { token } = useContext(AuthContext);

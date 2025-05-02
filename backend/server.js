@@ -16,6 +16,11 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 app.use(compression());
 
+app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+  
+
 const uri = process.env.MONGO_URI;
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB Atlas'))

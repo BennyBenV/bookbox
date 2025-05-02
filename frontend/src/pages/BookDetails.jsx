@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import { getBooks, createBook, getEditionInfo} from "../services/bookService";
 import { getAverageRating, getPublicReviews } from "../services/reviewService";
 import BookFormCard from "../components/BookFormCard";
-import "../styles/pages/BookDetails.css";
+import "../styles/pages/bookDetails.css";
 const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
 export default function BookDetails() {

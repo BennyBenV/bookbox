@@ -46,12 +46,12 @@ export default function Header() {
                         <Link to="/stats">Statistiques</Link>
                         <div className="user-menu" ref={dropdownRef}>
                             <button className="user-icon" onClick={() => setDropdownOpen(!dropdownOpen)} aria-label="account">
-                                <img src={`${MEDIA}${user.avatar}`} alt="avatar" className="avatar" />
+                                <img src={user?.avatar ? `${MEDIA}${user.avatar}` : "/default.jpg"} alt="avatar" className="avatar" />
                             </button>
 
                             <div className={`user-dropdown ${dropdownOpen ? "open" : ""}`}>
                                 <div className="user-dropdown-header">
-                                    <img src={`${MEDIA}${user.avatar}`} alt="avatar" className="avatar" />
+                                    <img src={user?.avatar ? `${MEDIA}${user.avatar}` : "/default.jpg"} alt="avatar" className="avatar" />
                                     <p className="dropdown-username">{user?.username}</p>
                                 </div>
                                 <Link to="/user">Modifier le profil</Link>

@@ -11,20 +11,29 @@ export function AuthProvider({ children }) {
 
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user")
+        const initAuth = async () => {
+            const storedToken = localStorage.getItem("token");
+            if (!storedToken){
+                setLoading(false);
+                return;
+            }
 
-        try{
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-          setIsAuthenticated(true);
-        }catch(err){
-            console.error("User data invalid: ", err);
-            localStorage.removeItem("user");
-        }
+            try{
+                const me = await getMe();
+                setToken(storedToken);
+                setUser(me);
+                setIsAuthenticated(true);
+            }catch(err){
+                console.error("Auth error:", err.message);
+                logout();
+            }finally{
+                setLoading(false);
+            }
+        };
+        initAuth();
+    }, []);
         
-        setLoading(false); // <- une fois le check terminé
-      }, []);
+ 
       
       
 
@@ -50,6 +59,7 @@ export function AuthProvider({ children }) {
             setUser(me);
         }catch(err){
             console.error("Erreur chargement user", err);
+            logout();
         }
     }
 

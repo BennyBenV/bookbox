@@ -18,23 +18,37 @@ export default function Home() {
         if (!isAuthenticated) {
             navigate("/login");
             return;
-        }      
-        const fetchData = async () => {
-            try{
-                const [booksData, statsData, discoverData, trendingData] = await Promise.all([getBooks(), getStats(), getDiscoverBooks(), getTrending()]);
+        }
+    
+        const start = performance.now();
+    
+        const fetchCoreData = async () => {
+            try {
+                const [booksData, statsData, trendingData] = await Promise.all([
+                    getBooks(),
+                    getStats(),
+                    getTrending()
+                ]);
                 setBooks(booksData);
                 setStats(statsData);
-                setDiscover(discoverData)
-                setTrending(trendingData)
-
-            }catch(err){
+                setTrending(trendingData);
+    
+                console.log("Core loaded in", (performance.now() - start).toFixed(2), "ms");
+            } catch (err) {
                 console.error(err);
-                // alert("Erreur lors de la récupération des données !");
             }
-        }
-        fetchData();
+        };
+        fetchCoreData();
     }, [isAuthenticated]);
-
+    
+    useEffect(() => {
+        const fetchDiscover = async () => {
+            const data = await getDiscoverBooks();
+            setDiscover(data);
+        };
+        fetchDiscover();
+    }, []);
+    
     const topRated = books.filter((book) => book.rating >= 4);
     const enCours = books.filter((book) => book.status === "En cours");
     const recentlyAdded = [...books].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,3);

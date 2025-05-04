@@ -95,24 +95,46 @@ exports.getStats= async (req, res) => {
 
 
 
-exports.getTrendingBooks = async (req,res) => {
-    try{
+exports.getTrendingBooks = async (req, res) => {
+    try {
         const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() -7);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const trending = await Book.find({
-            rating: {$gt : 0},
-            updatedAt: { $gte : sevenDaysAgo}
-        }).sort({updatedAt: -1, rating: -1}).limit(10);
+        const trending = await Book.aggregate([
+            {
+                $match: {
+                    rating: { $gt: 0 },
+                    updatedAt: { $gte: sevenDaysAgo }
+                }
+            },
+            {
+                $sort: {
+                    updatedAt: -1,
+                    rating: -1
+                }
+            },
+            {
+                $group: {
+                    _id: "$olid",
+                    doc: { $first: "$$ROOT" }
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: "$doc"
+                }
+            },
+            {
+                $limit: 10
+            }
+        ]);
 
         res.json(trending);
-    }catch(err){
+    } catch (err) {
         console.error("Erreur tendances : ", err);
-        res.status(500).json({message: "Erreur récupération des livres tendances"});
+        res.status(500).json({ message: "Erreur récupération des livres tendances" });
     }
-}
-
-
+};
 
 
 // exports.debugCreateBook = async (req, res) => {

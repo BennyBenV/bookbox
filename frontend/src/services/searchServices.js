@@ -14,7 +14,7 @@ export const getDiscoverBooks = async () => {
     const random = keywords[Math.floor(Math.random() * keywords.length)];
     const controller = new AbortController();
 
-    const timeout = setTimeout(() => controller.abort(), 1500);  // abort after 1.5s
+    // const timeout = setTimeout(() => controller.abort(), 1500);  // abort after 1.5s
 
     try {
         const res = await fetch(`https://openlibrary.org/search.json?q=${random}&limit=10`, {
@@ -34,7 +34,5 @@ export const getDiscoverBooks = async () => {
     } catch (error) {
         console.warn("getDiscoverBooks failed or timeout:", error);
         return []; // fallback empty list or use cache
-    } finally {
-        clearTimeout(timeout);
-    }
+    } 
 };

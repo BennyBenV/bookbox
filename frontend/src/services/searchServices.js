@@ -2,10 +2,19 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL;
 
-export const searchBooks = async (query) => {
-    const res = await axios.get(`https://openlibrary.org/search.json?q=${query}`);
-    return res.data.docs;
+export async function searchBooks(query) {
+    console.time("[searchBooks] API call");
+    try {
+        const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        console.timeEnd("[searchBooks] API call");
+        return data.docs;
+    } catch (err) {
+        console.error("[searchBooks] failed:", err);
+        throw err;
+    }
 }
+
 
 // services/searchServices.js
 

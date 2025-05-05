@@ -5,6 +5,8 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/auth.css";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export default function Login() {
     const { login }= useContext(AuthContext);

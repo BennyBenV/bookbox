@@ -3,6 +3,10 @@ import { registerUser } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import "../styles/pages/auth.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Register() {
     const { login }= useContext(AuthContext);
@@ -11,6 +15,7 @@ export default function Register() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -18,6 +23,7 @@ export default function Register() {
         try{
             const {token, user} = await registerUser(email, username, password);
             login(token, user); // Met à jour le contexte d'authentification
+            navigate("/");
             // alert("Inscription réussie !");
              toast.success("Inscription réussie !");
             

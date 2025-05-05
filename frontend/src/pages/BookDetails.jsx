@@ -56,7 +56,7 @@ export default function BookDetails() {
               authorsPromise,
             ]);
 
-            // console.timeEnd("[BookDetails] Parallel fetches");
+            console.timeEnd("[BookDetails] Parallel fetches");
       
             setBookOL({
               ...bookRes.data,
@@ -72,23 +72,23 @@ export default function BookDetails() {
             console.time("[BookDetails] getAverageRating");
             const avg = await getAverageRating(olid);
             setAvgRating(avg);
-            // console.timeEnd("[BookDetails] getAverageRating");
+            console.timeEnd("[BookDetails] getAverageRating");
       
             console.time("[BookDetails] getBooks");
             const allBooks = await getBooks();
             const found = allBooks.find((b) => normalize(b.title) === normalize(bookRes.data.title));
             setUserBook(found || null);
-            // console.timeEnd("[BookDetails] getBooks");
+            console.timeEnd("[BookDetails] getBooks");
       
             console.time("[BookDetails] getPublicReviews");
             const reviews = await getPublicReviews(olid);
             setPublicReviews(reviews);
-            // console.timeEnd("[BookDetails] getPublicReviews");
+            console.timeEnd("[BookDetails] getPublicReviews");
       
           } catch (error) {
             console.error("Erreur lors de la récupération des données :", error);
           } finally {
-            // console.timeEnd("[BookDetails] TOTAL");
+            console.timeEnd("[BookDetails] TOTAL");
             setLoading(false);
           }
         };

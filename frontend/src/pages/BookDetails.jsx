@@ -1,118 +1,138 @@
+// src/pages/BookDetails.jsx
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios, { all } from "axios";
+import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
-import { getBooks, createBook, getEditionInfo} from "../services/bookService";
+import { getBooks, createBook, getEditionInfo } from "../services/bookService";
 import { getAverageRating, getPublicReviews } from "../services/reviewService";
 import BookFormCard from "../components/BookFormCard";
 import "../styles/pages/bookDetails.css";
+
 const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
 export default function BookDetails() {
-  const { olid } = useParams(); //ID Open Library
+  const { olid } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
 
   const [bookOL, setBookOL] = useState(null);
-  const [ authorsNames, setAuthorsNames] = useState([]);
-  const [ loading, setLoading] = useState(true);
-  const [ userBook, setUserBook] = useState(null);
+  const [authorsNames, setAuthorsNames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userBook, setUserBook] = useState(null);
   const [avgRating, setAvgRating] = useState(null);
   const [publicReviews, setPublicReviews] = useState([]);
   const [genres, setGenres] = useState([]);
 
-  // Normalisation pour comparer les titres
-  const normalize = (str) => {
-    return str?.toLowerCase()
+  const normalize = (str) =>
+    str?.toLowerCase()
       .normalize("NFD")
       .replace(/\p{Diacritic}/gu, "")
       .replace(/\s+/g, "")
       .replace(/[^a-z0-9]/g, "");
-  }
-  
 
-  // Chargement au montage de la page
-  useEffect(() => {
-    if(!isAuthenticated) return;
-    const fetchData = async () => {
-      try{
-        const res = await axios.get(`https://openlibrary.org/works/${olid}.json`);
-        setBookOL(res.data);
+      useEffect(() => {
+        if (!isAuthenticated) return;
+      
+        const fetchData = async () => {
+          console.time("[BookDetails] TOTAL");
+      
+          try {
+            console.time("[BookDetails] Parallel fetches");
+            const bookPromise = axios.get(`https://openlibrary.org/works/${olid}.json`);
+            const editionPromise = getEditionInfo(olid);
+            const authorsPromise = bookPromise.then(async (res) => {
+              return await Promise.all(
+                (res.data.authors || []).map(async (a) => {
+                  const id = a.author.key.replace("/authors/", "");
+                  const aRes = await axios.get(`https://openlibrary.org/authors/${id}.json`);
+                  return aRes.data.name;
+                })
+              );
+            });
+      
+            const [bookRes, editionInfo, authorsNames] = await Promise.all([
+              bookPromise,
+              editionPromise,
+              authorsPromise,
+            ]);
 
-        const authors = await Promise.all((res.data.authors || []).map(async (a) => {
-        const id = a.author.key.replace("/authors/", "");
-        const aRes = await axios.get(`https://openlibrary.org/authors/${id}.json`);
-        return aRes.data.name;
-      })
-    );
-    
-      setAuthorsNames(authors);
-      const subjects = res.data.subjects || [];
-      setGenres(subjects.slice(0,3));
-        if (olid) {
-          const res = await getAverageRating(olid);
-          setAvgRating(res);
-        }
-         //Si connecté, on vérifier si ce livre est dans la bibliothèque de l'utilisateur
-        if (isAuthenticated){
-          const allBooks = await getBooks();
-          const found = allBooks.find((b) => normalize(b.title) === normalize(res.data.title));
-          setUserBook(found || null);
-        }
-        const reviews = await getPublicReviews(olid);
-        setPublicReviews(reviews);
-        const edition = await getEditionInfo(olid);
-        setBookOL({
-          ...res.data,
-          publishDate: edition.publishDate,
-          publisher: edition.publisher,
-        });
-      }catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
-      }
-      finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [olid, isAuthenticated]);
-
+            // console.timeEnd("[BookDetails] Parallel fetches");
+      
+            setBookOL({
+              ...bookRes.data,
+              publishDate: editionInfo.publishDate,
+              publisher: editionInfo.publisher,
+            });
+      
+            setAuthorsNames(authorsNames);
+      
+            const subjects = bookRes.data.subjects || [];
+            setGenres(subjects.slice(0, 3));
+      
+            console.time("[BookDetails] getAverageRating");
+            const avg = await getAverageRating(olid);
+            setAvgRating(avg);
+            // console.timeEnd("[BookDetails] getAverageRating");
+      
+            console.time("[BookDetails] getBooks");
+            const allBooks = await getBooks();
+            const found = allBooks.find((b) => normalize(b.title) === normalize(bookRes.data.title));
+            setUserBook(found || null);
+            // console.timeEnd("[BookDetails] getBooks");
+      
+            console.time("[BookDetails] getPublicReviews");
+            const reviews = await getPublicReviews(olid);
+            setPublicReviews(reviews);
+            // console.timeEnd("[BookDetails] getPublicReviews");
+      
+          } catch (error) {
+            console.error("Erreur lors de la récupération des données :", error);
+          } finally {
+            // console.timeEnd("[BookDetails] TOTAL");
+            setLoading(false);
+          }
+        };
+      
+        fetchData();
+      }, [olid, isAuthenticated]);
+      
   if (loading) return <p>Chargement...</p>;
   if (!bookOL) return <p>Erreur lors de la récupération du livre.</p>;
 
   const { title, description, covers } = bookOL;
   const coverId = covers?.[0];
-  const finalDescription = typeof description === "string" ? description : description?.value || "Pas de description disponible.";
+  const finalDescription =
+    typeof description === "string" ? description : description?.value || "Pas de description disponible.";
 
   const refreshReviews = async () => {
-    try{
+    try {
       const reviews = await getPublicReviews(olid);
       setPublicReviews(reviews);
-    }catch(error){
+    } catch (error) {
       console.error("Erreur lors du rechargement des reviews", error);
     }
-  }
+  };
 
   const refreshAverageRating = async () => {
-    if(olid){
-      try{
+    if (olid) {
+      try {
         const res = await getAverageRating(olid);
         setAvgRating(res);
-      }catch(err){
-        console.error("Erreur lors du rechargement de la moyenne : ", err)
+      } catch (err) {
+        console.error("Erreur lors du rechargement de la moyenne : ", err);
       }
     }
-  }
+  };
 
-  return(
+  return (
     <div className="book-details">
       {coverId && (
         <img
           src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
           alt="Couverture"
           className="book-cover-large"
-          loading="eager" 
-          width="400" 
+          loading="eager"
+          width="400"
           height="600"
         />
       )}
@@ -124,19 +144,18 @@ export default function BookDetails() {
         {genres.length > 0 && (
           <p className="genres">
             <strong>Genres :</strong>{" "}
-            {genres.map((g,i) => (
+            {genres.map((g, i) => (
               <span key={i} className="genre">{g}</span>
             ))}
           </p>
         )}
-
         <p className="desc">{finalDescription}</p>
         {avgRating?.average && (
-          <p className="avg-rating">⭐ Moyenne : {avgRating.average} / 5 ({avgRating.count} vote{avgRating.count > 1 ? "s" : ""})</p>
+          <p className="avg-rating">
+            ⭐ Moyenne : {avgRating.average} / 5 ({avgRating.count} vote{avgRating.count > 1 ? "s" : ""})
+          </p>
         )}
       </div>
-      
-
 
       {isAuthenticated && (
         <div className="user-zone">
@@ -173,13 +192,9 @@ export default function BookDetails() {
                 <p>{r.review}</p>
               </div>
             ))}
-
           </div>
         )}
       </div>
     </div>
-
-  )
-
-  
+  );
 }

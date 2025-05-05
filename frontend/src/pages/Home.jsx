@@ -33,7 +33,7 @@ export default function Home() {
                 setStats(statsData);
                 setTrending(trendingData);
     
-                console.log("Core loaded in", (performance.now() - start).toFixed(2), "ms");
+                // console.log("Core loaded in", (performance.now() - start).toFixed(2), "ms");
             } catch (err) {
                 console.error(err);
             }

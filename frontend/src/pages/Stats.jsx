@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { getStats} from "../services/bookService";
 import "../styles/pages/stats.css"
+import { AuthContext } from "../context/AuthContext";
 
 export default function Stats(){
     const { isAuthenticated } = useContext(AuthContext);

@@ -57,7 +57,7 @@ export default function App() {
               <AppLayout><SearchBooks /></AppLayout>
             </ProtectedRoute>
           } />
-          <Route path="/book/:olid" element={
+          <Route path="/book/:id" element={
             <ProtectedRoute>
               <AppLayout><BookDetails /></AppLayout>
             </ProtectedRoute>

@@ -1,62 +1,140 @@
 const Review = require("../models/Review");
 
-exports.getReviewsByBook = async (req, res) =>{
-    try{
-        const { olid } = req.params;
-        const reviews = await Review.find({olid}).sort({createdAt: -1}).populate("userId", "username avatar");
-        res.json(reviews.map(r => ({
-            rating : r.rating,
-            review : r.review,
-            user: r.userId?.username || "Anonymous",
-            avatar: r.userId?.avatar || "uploads/avatars/default.jpg",
-            createdAt : r.createdAt
-        })));
-    }catch(err){
-        res.status(500).json({message: "Erreur getReviewsByBook"});
+// GET - All reviews for a Google Book ID
+exports.getReviewsByBook = async (req, res) => {
+  try {
+    const { googleBookId } = req.params;
+    if (!googleBookId)
+      return res.status(400).json({ success: false, message: "Missing Google Book ID." });
+
+    const reviews = await Review.find({ googleBookId })
+      .sort({ createdAt: -1 })
+      .populate("userId", "username avatar");
+
+    const formatted = reviews.map((r) => ({
+      rating: r.rating,
+      review: r.review,
+      user: r.userId?.username || "Anonymous",
+      avatar: r.userId?.avatar || "uploads/avatars/default.jpg",
+      createdAt: r.createdAt,
+    }));
+
+    res.json({ success: true, reviews: formatted });
+  } catch (err) {
+    console.error("Error fetching reviews:", err);
+    res.status(500).json({ success: false, message: "Erreur getReviewsByBook" });
+  }
+};
+
+
+// POST - Create or update a review for a Google Book
+exports.createOrUpdateReview = async (req, res) => {
+  try {
+    const { googleBookId, rating, review } = req.body;
+    const userId = req.user?.id;
+
+    if (!googleBookId || !userId) {
+      return res.status(400).json({ success: false, message: "Google Book ID or user ID missing." });
     }
-}
 
-exports.createOrUpdateReview = async (req,res) => {
-    try{
-        const {olid, rating, review} = req.body;
-        const existing = await Review.findOne({ userId: req.user.id, olid});
+    const existingReview = await Review.findOne({ userId, googleBookId });
 
-        if(existing){
-            existing.rating = rating;
-            existing.review = review;
-            await existing.save();
-            return res.json(existing);
-        }
-
-        const newReview = await Review.create({
-            userId: req.user.id,
-            olid,
-            rating,
-            review,
-        });
-        
-        res.status(201).json(newReview);
-    }catch(err){
-        res.status(500).json({message: "Erreur createOrUpdateReview"});
+    if (existingReview) {
+      if (rating !== undefined) existingReview.rating = rating;
+      if (review !== undefined) existingReview.review = review;
+      await existingReview.save();
+      return res.json({ success: true, review: existingReview });
     }
-}
 
-exports.getAverageRating = async (req,res) => {
-    const {olid} = req.params;
+    const newReview = await Review.create({
+      userId,
+      googleBookId,
+      rating: rating ?? 0,
+      review: review ?? "",
+    });
 
-    try{
-        //Récupère tous les livres ayant ce même OLID
-        const reviews = await Review.find({olid, rating: {$gt: 0} });
+    res.status(201).json({ success: true, review: newReview });
+  } catch (err) {
+    console.error("Error saving review:", err);
+    res.status(500).json({ success: false, message: "Erreur createOrUpdateReview" });
+  }
+};
 
-        if (reviews.length === 0 ){
-            return res.json({average: null, count: 0});
-        }
-        const total = reviews.reduce((sum,b) => sum + b.rating, 0);
-        const average = total / reviews.length;
+// GET - Get current user's review for a specific Google Book
+exports.getUserReview = async (req, res) => {
+  try {
+    const { googleBookId } = req.params;
+    const userId = req.user?.id;
 
-        res.json({ average: Number(average.toFixed(2)), count: reviews.length });
-    }catch(error){
-        console.error("Erreur calcul moyenne note : ", error);
-        res.status(500).json({ message : "Erreur lors du calcul de la moyenne." })
+    if (!googleBookId || !userId) {
+      return res.status(400).json({ success: false, message: "Google Book ID or user ID missing." });
     }
-}
+
+    const review = await Review.findOne({ googleBookId, userId });
+
+    if (!review) {
+      return res.json({ success: true, review: null });
+    }
+
+    res.json({
+      success: true,
+      review: {
+        rating: review.rating,
+        review: review.review,
+        createdAt: review.createdAt,
+      },
+    });
+  } catch (err) {
+    console.error("Erreur getUserReview:", err);
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+};
+
+
+//Update only the review text
+exports.updateReviewText = async (req, res) => {
+  try {
+    const { googleBookId } = req.params;
+    const { review } = req.body;
+    const userId = req.user?.id;
+
+    if (!googleBookId || !userId) {
+      return res.status(400).json({ success: false, message: "Missing parameters." });
+    }
+
+    const existingReview = await Review.findOne({ googleBookId, userId });
+    if (!existingReview) {
+      return res.status(404).json({ success: false, message: "Review not found." });
+    }
+
+    existingReview.review = review;
+    await existingReview.save();
+
+    res.json({ success: true, review: existingReview });
+  } catch (err) {
+    console.error("Erreur updateReviewText:", err);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+// GET - Average rating for a Google Book ID
+exports.getAverageRating = async (req, res) => {
+  try {
+    const { googleBookId } = req.params;
+    if (!googleBookId) return res.status(400).json({ success: false, message: "Missing Google Book ID." });
+
+    const reviews = await Review.find({ googleBookId, rating: { $gt: 0 } });
+
+    if (!reviews.length) {
+      return res.json({ success: true, average: null, count: 0 });
+    }
+
+    const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const average = total / reviews.length;
+
+    res.json({ success: true, average: Number(average.toFixed(2)), count: reviews.length });
+  } catch (err) {
+    console.error("Erreur calcul moyenne note:", err);
+    res.status(500).json({ success: false, message: "Erreur lors du calcul de la moyenne." });
+  }
+};

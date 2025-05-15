@@ -1,155 +1,126 @@
-// src/pages/BookDetails.jsx
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
-import { getBooks, createBook, getEditionInfo } from "../services/bookService";
-import { getAverageRating, getPublicReviews } from "../services/reviewService";
+// BookDetails.jsx - utilise getUserReview isolé pour éviter conflit avec BookFormCard
+import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import BookFormCard from "../components/BookFormCard";
+import { AuthContext } from "../context/AuthContext";
+import { getBooks, getGoogleBookById } from "../services/bookService";
+import { getPublicReviews, getAverageRating, createOrUpdateReview, getUserReview } from "../services/reviewService";
+import { toast } from "react-toastify";
 import "../styles/pages/bookDetails.css";
 
 const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
+const normalize = (str) =>
+  str?.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
+
 export default function BookDetails() {
-  const { olid } = useParams();
-  const navigate = useNavigate();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { id } = useParams();
+  const { isAuthenticated, user } = useContext(AuthContext);
 
-  const [bookOL, setBookOL] = useState(null);
-  const [authorsNames, setAuthorsNames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookData, setBookData] = useState(null);
   const [userBook, setUserBook] = useState(null);
-  const [avgRating, setAvgRating] = useState(null);
   const [publicReviews, setPublicReviews] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const [avgRating, setAvgRating] = useState(null);
+  const [error, setError] = useState(null);
 
-  const normalize = (str) =>
-    str?.toLowerCase()
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .replace(/\s+/g, "")
-      .replace(/[^a-z0-9]/g, "");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewText, setReviewText] = useState("");
+  const [userReview, setUserReview] = useState(null);
 
-      useEffect(() => {
-        if (!isAuthenticated) return;
-      
-        const fetchData = async () => {
-          console.time("[BookDetails] TOTAL");
-      
-          try {
-            console.time("[BookDetails] Parallel fetches");
-            const bookPromise = axios.get(`https://openlibrary.org/works/${olid}.json`);
-            const editionPromise = getEditionInfo(olid);
-            const authorsPromise = bookPromise.then(async (res) => {
-              return await Promise.all(
-                (res.data.authors || []).map(async (a) => {
-                  const id = a.author.key.replace("/authors/", "");
-                  const aRes = await axios.get(`https://openlibrary.org/authors/${id}.json`);
-                  return aRes.data.name;
-                })
-              );
-            });
-      
-            const [bookRes, editionInfo, authorsNames] = await Promise.all([
-              bookPromise,
-              editionPromise,
-              authorsPromise,
-            ]);
+  useEffect(() => {
+    if (!id) return;
 
-            console.timeEnd("[BookDetails] Parallel fetches");
-      
-            setBookOL({
-              ...bookRes.data,
-              publishDate: editionInfo.publishDate,
-              publisher: editionInfo.publisher,
-            });
-      
-            setAuthorsNames(authorsNames);
-      
-            const subjects = bookRes.data.subjects || [];
-            setGenres(subjects.slice(0, 3));
-      
-            console.time("[BookDetails] getAverageRating");
-            const avg = await getAverageRating(olid);
-            setAvgRating(avg);
-            console.timeEnd("[BookDetails] getAverageRating");
-      
-            console.time("[BookDetails] getBooks");
-            const allBooks = await getBooks();
-            const found = allBooks.find((b) => normalize(b.title) === normalize(bookRes.data.title));
-            setUserBook(found || null);
-            console.timeEnd("[BookDetails] getBooks");
-      
-            console.time("[BookDetails] getPublicReviews");
-            const reviews = await getPublicReviews(olid);
-            setPublicReviews(reviews);
-            console.timeEnd("[BookDetails] getPublicReviews");
-      
-          } catch (error) {
-            console.error("Erreur lors de la récupération des données :", error);
-          } finally {
-            console.timeEnd("[BookDetails] TOTAL");
-            setLoading(false);
-          }
-        };
-      
-        fetchData();
-      }, [olid, isAuthenticated]);
-      
-  if (loading) return <p>Chargement...</p>;
-  if (!bookOL) return <p>Erreur lors de la récupération du livre.</p>;
-
-  const { title, description, covers } = bookOL;
-  const coverId = covers?.[0];
-  const finalDescription =
-    typeof description === "string" ? description : description?.value || "Pas de description disponible.";
-
-  const refreshReviews = async () => {
-    try {
-      const reviews = await getPublicReviews(olid);
-      setPublicReviews(reviews);
-    } catch (error) {
-      console.error("Erreur lors du rechargement des reviews", error);
-    }
-  };
-
-  const refreshAverageRating = async () => {
-    if (olid) {
+    const fetchBookDetails = async () => {
       try {
-        const res = await getAverageRating(olid);
-        setAvgRating(res);
+        const data = await getGoogleBookById(id);
+        if (data.error) {
+          setError(data.error.message || "Erreur API Google");
+        } else {
+          setBookData(data);
+        }
       } catch (err) {
-        console.error("Erreur lors du rechargement de la moyenne : ", err);
+        setError("Impossible de charger les données du livre.");
+        console.error(err);
       }
+    };
+
+    fetchBookDetails();
+    fetchReviews();
+    fetchUserReview();
+    getAverageRating(id).then(setAvgRating);
+  }, [id]);
+
+  const fetchUserReview = async () => {
+    if (!user) return;
+    const review = await getUserReview(id);
+    setUserReview(review);
+  };
+
+  const fetchReviews = async () => {
+    const res = await getPublicReviews(id);
+    setPublicReviews(res.reviews || []);
+  };
+
+  useEffect(() => {
+    if (!bookData?.title || !isAuthenticated) return;
+
+    getBooks().then((books) => {
+      const match = books.find((b) => normalize(b.title) === normalize(bookData.title));
+      setUserBook(match || null);
+    });
+  }, [bookData]);
+
+  const openReviewModal = () => {
+    if (userReview) {
+      setReviewText(userReview.review || "");
+    } else {
+      setReviewText("");
+    }
+    setShowReviewModal(true);
+  };
+
+  const handleReviewSubmit = async () => {
+    try {
+      await createOrUpdateReview({ googleBookId: id, review: reviewText });
+      toast.success("Avis enregistré ✅");
+      setShowReviewModal(false);
+      await fetchReviews();
+      await fetchUserReview();
+      getAverageRating(id).then(setAvgRating);
+    } catch (err) {
+      toast.error("Erreur lors de la soumission de l'avis ❌");
     }
   };
+
+  if (!id) return <p>ID de livre manquant.</p>;
+  if (error) return <p>Erreur : {error}</p>;
+  if (!bookData) return <p>Chargement...</p>;
+
+  const title = bookData.title || "Titre inconnu";
+  const authorsNames = bookData.authors || [];
+  const coverUrl = bookData.image?.replace("http:", "https:");
+  const publisher = bookData.publisher;
+  const publishDate = bookData.publishedDate;
+  const description = bookData.description?.replace(/<[^>]+>/g, "") || "Pas de description disponible.";
+  const categories = [];
 
   return (
     <div className="book-details">
-      {coverId && (
+      {coverUrl && (
         <img
-          src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
+          src={coverUrl}
           alt="Couverture"
           className="book-cover-large"
           loading="eager"
-          width="400"
-          height="600"
         />
       )}
 
       <div className="book-main">
-        <h1>{title} ({bookOL.publishDate})</h1>
+        <h1>{title} {publishDate && <>({publishDate})</>}</h1>
         <p className="authors"><strong>Auteur(s):</strong> {authorsNames.join(", ")}</p>
-        {bookOL.publisher && <p><strong>Éditeur :</strong> {bookOL.publisher}</p>}
-        {genres.length > 0 && (
-          <p className="genres">
-            <strong>Genres :</strong>{" "}
-            {genres.map((g, i) => (
-              <span key={i} className="genre">{g}</span>
-            ))}
-          </p>
-        )}
-        <p className="desc">{finalDescription}</p>
+        {publisher && <p><strong>Éditeur :</strong> {publisher}</p>}
+        {categories.length > 0 && <p><strong>Genres :</strong> {categories.join(", ")}</p>}
+        <p className="desc">{description}</p>
         {avgRating?.average && (
           <p className="avg-rating">
             ⭐ Moyenne : {avgRating.average} / 5 ({avgRating.count} vote{avgRating.count > 1 ? "s" : ""})
@@ -163,20 +134,49 @@ export default function BookDetails() {
             initialData={userBook}
             title={title}
             author={authorsNames.join(", ")}
-            coverId={coverId}
-            olid={olid}
+            thumbnail={coverUrl}
+            googleBookId={id}
             onSuccess={async () => {
               const updated = await getBooks();
               const match = updated.find((b) => normalize(b.title) === normalize(title));
               setUserBook(match || null);
-              refreshReviews();
-              refreshAverageRating();
+              await fetchReviews();
+              getAverageRating(id).then(setAvgRating);
+              await fetchUserReview();
             }}
           />
         </div>
       )}
 
       <div className="book-reviews-wrapper">
+        {isAuthenticated && (
+          <div className="review-button">
+            <button className="review-btn" onClick={openReviewModal}>
+              {userReview ? "✏️ Modifier mon avis" : "✍️ Ajouter un avis"}
+            </button>
+          </div>
+        )}
+
+        {showReviewModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h4>{userReview ? "Modifier mon avis" : "Exprime-toi !"}</h4>
+              <textarea
+                rows={8}
+                placeholder="Qu'as-tu pensé de ce livre ?"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+              />
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setShowReviewModal(false)}>Annuler</button>
+                <button className="btn-primary" onClick={handleReviewSubmit}>
+                  {userReview ? "Mettre à jour" : "Publier"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {publicReviews.length > 0 && (
           <div className="public-reviews">
             <h3> Avis des lecteurs </h3>
@@ -184,9 +184,13 @@ export default function BookDetails() {
               <div key={i} className="review-item">
                 <div className="review-header">
                   {r.avatar && (
-                    <img src={r.avatar ? `${MEDIA}${r.avatar}` : "/default.jpg"} alt="avatar" className="review-avatar" />
+                    <img
+                      src={r.avatar ? `${MEDIA}${r.avatar}` : "/default.jpg"}
+                      alt="avatar"
+                      className="review-avatar"
+                    />
                   )}
-                  <strong>{r.user}</strong>{" "}
+                  <strong>{r.user}</strong>
                   {r.rating > 0 && <> - {r.rating}/5</>}
                 </div>
                 <p>{r.review}</p>

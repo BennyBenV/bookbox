@@ -1,47 +1,48 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL;
+const GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes";
+
+const cleanGoogleBook = (item) => {
+    const info = item.volumeInfo;
+    return {
+        id: item.id,
+        title: info.title,
+        author: info.authors?.[0] ?? "Unknown",
+        cover: info.imageLinks?.thumbnail ?? null,
+        publishedDate: info.publishedDate ?? null,
+        description: info.description ?? null,
+    };
+};
 
 export async function searchBooks(query) {
-    console.time("[searchBooks] API call");
+    console.time("[searchBooks] Google API call");
     try {
-        const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        console.timeEnd("[searchBooks] API call");
-        return data.docs;
+        const res = await axios.get(GOOGLE_BOOKS_API, {
+            params: { q: query, maxResults: 10 },
+        });
+        console.timeEnd("[searchBooks] Google API call");
+        return res.data.items?.map(cleanGoogleBook) ?? [];
     } catch (err) {
         console.error("[searchBooks] failed:", err);
         throw err;
     }
 }
 
-
-// services/searchServices.js
-
 export const getDiscoverBooks = async () => {
     const keywords = ["love", "magic", "adventure", "story", "life"];
     const random = keywords[Math.floor(Math.random() * keywords.length)];
-    const controller = new AbortController();
-
-    // const timeout = setTimeout(() => controller.abort(), 1500);  // abort after 1.5s
 
     try {
-        const res = await fetch(`https://openlibrary.org/search.json?q=${random}&limit=10`, {
-            signal: controller.signal,
+        const res = await axios.get(GOOGLE_BOOKS_API, {
+            params: { q: random, maxResults: 10 },
         });
-        const data = await res.json();
 
-        return data.docs
-            .filter(b => b.cover_i && b.title && b.author_name && b.key)
+        return res.data.items
+            ?.filter(item => item.volumeInfo?.title && item.volumeInfo?.authors)
             .slice(0, 6)
-            .map(book => ({
-                title: book.title,
-                author: book.author_name[0],
-                coverId: book.cover_i,
-                olid: book.key.replace("/works/", ""),
-            }));
+            .map(cleanGoogleBook) ?? [];
     } catch (error) {
-        console.warn("getDiscoverBooks failed or timeout:", error);
-        return []; // fallback empty list or use cache
-    } 
+        console.warn("[getDiscoverBooks] failed:", error);
+        return [];
+    }
 };

@@ -42,8 +42,7 @@ export default function Header() {
                     <>
                         <Link to="/">Accueil</Link>
                         <Link to="/dashboard">Ma Bibliothèque</Link>
-                        {/* <Link to="/search">Rechercher un livre</Link> */}
-                        <Link to="/stats">Statistiques</Link>
+                        <Link to={`/user/${user?.username}`}>Mon profil</Link>
                         <div className="user-menu" ref={dropdownRef}>
                             <button className="user-icon" onClick={() => setDropdownOpen(!dropdownOpen)} aria-label="account">
                                 <img src={user?.avatar ? `${MEDIA}${user.avatar}` : "/default.jpg"} alt="avatar" className="avatar" />

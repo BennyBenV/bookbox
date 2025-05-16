@@ -1,0 +1,129 @@
+    /* styles/pages/profile.css */
+    .profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    }
+
+    .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    }
+
+    .profile-bio {
+    font-style: italic;
+    color: #555;
+    margin-top: 0.4rem;
+    }
+
+    .profile-stats {
+    background-color: #f3f2f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    }
+
+    .profile-stats ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    }
+
+    .profile-section {
+    margin-bottom: 2.5rem;
+    }
+
+    .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    }
+
+    .book-tile {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #333;
+    }
+
+    .book-tile img {
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 0.3rem;
+    }
+
+.review-block {
+  background-color: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.review-book {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.review-book-cover {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.review-book-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+.review-book-author {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.review-block .rating {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #d18d1f;
+  margin: 0.5rem 0;
+}
+
+.review-block p {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+}
+
+.review-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: #3b5ba5;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.review-link:hover {
+  color: #2c3e80;
+  text-decoration: underline;
+}

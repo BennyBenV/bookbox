@@ -5,6 +5,7 @@ import { AuthContext } from './context/AuthContext';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
+// import PublicUser from './pages/PublicUser';
 
 // ⚡ Lazy load des pages
 const Login = lazy(() => import("./pages/Login"));
@@ -18,6 +19,8 @@ const Stats = lazy(() => import("./pages/Stats"));
 const Home = lazy(() => import("./pages/Home"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
+const PublicUser = lazy(() => import ('./pages/PublicUser'));
+
 
 export default function App() {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -80,6 +83,11 @@ export default function App() {
           <Route path="/user" element={
             <ProtectedRoute>
               <AppLayout><EditProfile /></AppLayout>
+            </ProtectedRoute>
+          } />
+          <Route caseSensitive={false} path="/user/:username" element={
+            <ProtectedRoute>
+              <AppLayout><PublicUser /></AppLayout>
             </ProtectedRoute>
           } />
 

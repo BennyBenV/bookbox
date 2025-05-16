@@ -7,8 +7,9 @@ const reviewSchema = new mongoose.Schema({
     required: true,
   },
   googleBookId: {
-    type: String,
+    type: mongoose.Schema.Types.String,
     required: true,
+    // ref: "Book"
   },
   rating: {
     type: Number,

@@ -7,6 +7,7 @@ import { getBooks, getGoogleBookById } from "../services/bookService";
 import { getPublicReviews, getAverageRating, createOrUpdateReview, getUserReview, deleteReview } from "../services/reviewService";
 import { toast } from "react-toastify";
 import "../styles/pages/bookDetails.css";
+import { Link } from "react-router-dom";
 
 const MEDIA = import.meta.env.VITE_MEDIA_URL;
 
@@ -203,16 +204,19 @@ export default function BookDetails() {
             {publicReviews.map((r, i) => (
               <div key={i} className="review-item">
                 <div className="review-header">
-                  {r.avatar && (
-                    <img
-                      src={r.avatar ? `${MEDIA}${r.avatar}` : "/default.jpg"}
-                      alt="avatar"
-                      className="review-avatar"
-                    />
-                  )}
-                  <strong>{r.user}</strong>
+                  <Link to={`/user/${r.user}`} className="review-user-link">
+                    {r.avatar && (
+                      <img
+                        src={r.avatar ? `${MEDIA}${r.avatar}` : "/default.jpg"}
+                        alt="avatar"
+                        className="review-avatar"
+                      />
+                    )}
+                    <strong>{r.user}</strong>
+                  </Link>
                   {r.rating > 0 && <> - {r.rating}/5</>}
                 </div>
+
                 <p>{r.review}</p>
               </div>
             ))}

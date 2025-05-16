@@ -31,7 +31,6 @@ export default function Home() {
         setBooks(booksData);
         setStats(statsData);
         setTrending(trendingData);
-        console.log(trendingData);
       } catch (err) {
         console.error("Erreur fetchCoreData:", err);
       }
@@ -43,7 +42,6 @@ export default function Home() {
     const fetchDiscover = async () => {
       const data = await getDiscoverBooks();
       setDiscover(data);
-      console.log(data);
     };
     fetchDiscover();
   }, []);

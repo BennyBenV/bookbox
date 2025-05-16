@@ -1,5 +1,7 @@
+// Dashboard.jsx – suppression avec modale de confirmation et review catch
 import { useState, useEffect, useContext } from 'react';
 import { getBooks, deleteBook } from '../services/bookService';
+import { deleteReview } from '../services/reviewService';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import "../styles/pages/dashboard.css";
@@ -13,6 +15,9 @@ export default function Dashboard() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOption, setSortOption] = useState("recent");
 
+    const [bookToDelete, setBookToDelete] = useState(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -21,10 +26,9 @@ export default function Dashboard() {
             try {
                 const data = await getBooks();
                 setBooks(data);
-                console.log(data);
-            }catch (error) {
+            } catch (error) {
                 console.error("Erreur lors de la récupération des livres :", error);
-            }finally{
+            } finally {
                 setLoading(false);
             }
         };
@@ -35,17 +39,21 @@ export default function Dashboard() {
 
     }, [isAuthenticated]);
 
+    const handleDelete = async () => {
+        try {
+            await deleteBook(bookToDelete._id);
 
-    const handleDelete = async (id) => {
-        if(!confirm("Êtes-vous sûr de vouloir supprimer ce livre ?")) return;
-        try{
-            await deleteBook(id);
-            setBooks(books.filter((b) => b._id !== id));
-        }catch(err){
+
+            setBooks(books.filter((b) => b._id !== bookToDelete._id));
+            toast.success("Livre supprimé ✅");
+        } catch (err) {
             console.error("Erreur lors de la suppression :", err);
             toast.error("Erreur lors de la suppression du livre.");
+        } finally {
+            setShowConfirmModal(false);
+            setBookToDelete(null);
         }
-    }
+    };
 
     const normalize = (str) =>
         str?.toLowerCase()
@@ -79,12 +87,6 @@ export default function Dashboard() {
                 return 0;
         }
     });
-
-    const getSourceLabel = (olid) => {
-        if (olid?.startsWith("GB-")) return "Google Books";
-        if (olid?.startsWith("OL")) return "Open Library";
-        return "Inconnu";
-    }
 
     if (!isAuthenticated) {
         return <p>Veuillez vous connecter pour voir le tableau de bord.</p>;
@@ -136,7 +138,11 @@ export default function Dashboard() {
         ) : (
         <ul className="book-list">
             {sortBooks.map((book) => (
-            <li key={book._id} className="book-card">
+            <li
+              key={book._id}
+              className="book-card"
+              onClick={() => navigate(`/book/${book.googleBookId}`)}
+            >
                 <img
                 src={book.thumbnail?.replace("http:", "https:") || "/default.jpg"}
                 alt="cover"
@@ -149,16 +155,32 @@ export default function Dashboard() {
                     {book.rating > 0 && (
                         <div className="book-rating">⭐ {book.rating} / 5</div>
                     )}
-                    </div>
-                    <div className="book-actions">
-                    <button onClick={() => navigate(`/book/${book.googleBookId}`)}>
-                        Voir
+                </div>
+                <div className="book-actions" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => navigate(`/book/${book.googleBookId}`)}>Voir</button>
+                    <button onClick={() => {
+                      setBookToDelete(book);
+                      setShowConfirmModal(true);
+                    }}>
+                      Supprimer
                     </button>
-                    <button onClick={() => handleDelete(book._id)}>Supprimer</button>
                 </div>
             </li>
             ))}
         </ul>
+        )}
+
+        {showConfirmModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h4>Supprimer ce livre ?</h4>
+              <p>Cette action supprimera aussi la note et la review associée.</p>
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setShowConfirmModal(false)}>Annuler</button>
+                <button className="btn-danger" onClick={handleDelete}>Confirmer la suppression</button>
+              </div>
+            </div>
+          </div>
         )}
     </div>
     );

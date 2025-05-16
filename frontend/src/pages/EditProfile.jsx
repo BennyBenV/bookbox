@@ -101,12 +101,12 @@ export default function EditProfile() {
                     Photo de profil : 
                     <input type="file" accept="image/*" onChange={handleFileUpload} />
                 </label>
-                {avatar && (
+                {/* {avatar && (
                     <div className="preview">
                         <p>Preview : </p>
                         <img src={avatar.startsWith("/uploads") ? `${MEDIA}${avatar}` : avatar} alt="avatar" />
                     </div>
-                )}
+                )} */}
 
                 
                 <button type="submit">Enregistrer</button>

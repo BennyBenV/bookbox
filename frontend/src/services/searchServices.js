@@ -15,12 +15,10 @@ const cleanGoogleBook = (item) => {
 };
 
 export async function searchBooks(query) {
-    console.time("[searchBooks] Google API call");
     try {
         const res = await axios.get(GOOGLE_BOOKS_API, {
-            params: { q: query, maxResults: 10 },
+            params: { q: query, maxResults: 40 },
         });
-        console.timeEnd("[searchBooks] Google API call");
         return res.data.items?.map(cleanGoogleBook) ?? [];
     } catch (err) {
         console.error("[searchBooks] failed:", err);

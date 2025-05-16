@@ -94,6 +94,13 @@ exports.deleteBook = async (req, res) => {
     try {
         const book = await Book.findByIdAndDelete({ _id: req.params.id, userId: req.user.id });
         if (!book) return res.status(404).json({ message: "Livre introuvable" });
+
+        // ⬇️ Supprime la review associée à ce livre pour cet utilisateur
+        await Review.deleteOne({
+          userId: req.user.id,
+          googleBookId: book.googleBookId,
+        });
+
         res.json({ message: "Livre supprimé" });
     } catch (error) {
         console.error(error);

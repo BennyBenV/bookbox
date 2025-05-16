@@ -1,0 +1,42 @@
+/* searchresults.css - styles pour la page SearchResults */
+
+.search-results-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.search-results-page h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #2c2c2c;
+  text-align: center;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.search-results-list .book-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.search-results-list .book-card:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .search-results-page {
+    padding: 0.5rem;
+  }
+  .search-results-page h2 {
+    font-size: 1.2rem;
+  }
+}

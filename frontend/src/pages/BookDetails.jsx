@@ -1,10 +1,10 @@
-// BookDetails.jsx - utilise getUserReview isolé pour éviter conflit avec BookFormCard
+// BookDetails.jsx — synchro review & BookFormCard après suppression
 import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import BookFormCard from "../components/BookFormCard";
 import { AuthContext } from "../context/AuthContext";
 import { getBooks, getGoogleBookById } from "../services/bookService";
-import { getPublicReviews, getAverageRating, createOrUpdateReview, getUserReview } from "../services/reviewService";
+import { getPublicReviews, getAverageRating, createOrUpdateReview, getUserReview, deleteReview } from "../services/reviewService";
 import { toast } from "react-toastify";
 import "../styles/pages/bookDetails.css";
 
@@ -26,6 +26,8 @@ export default function BookDetails() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [userReview, setUserReview] = useState(null);
+
+  const [showCoverModal, setShowCoverModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -71,11 +73,7 @@ export default function BookDetails() {
   }, [bookData]);
 
   const openReviewModal = () => {
-    if (userReview) {
-      setReviewText(userReview.review || "");
-    } else {
-      setReviewText("");
-    }
+    setReviewText(userReview?.review || "");
     setShowReviewModal(true);
   };
 
@@ -89,6 +87,24 @@ export default function BookDetails() {
       getAverageRating(id).then(setAvgRating);
     } catch (err) {
       toast.error("Erreur lors de la soumission de l'avis ❌");
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    const confirmDelete = window.confirm("Supprimer votre avis ?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteReview(id);
+      toast.success("Avis supprimé ✅");
+      setUserReview(null);
+      setReviewText("");
+      setUserBook((prev) => ({ ...prev, rating: 0 })); // 🆕 reset rating dans BookFormCard
+      setShowReviewModal(false);
+      await fetchReviews();
+      getAverageRating(id).then(setAvgRating);
+    } catch (err) {
+      toast.error("Erreur lors de la suppression ❌");
     }
   };
 
@@ -112,6 +128,7 @@ export default function BookDetails() {
           alt="Couverture"
           className="book-cover-large"
           loading="eager"
+          style={{ cursor: "zoom-in" }}
         />
       )}
 
@@ -172,6 +189,9 @@ export default function BookDetails() {
                 <button className="btn-primary" onClick={handleReviewSubmit}>
                   {userReview ? "Mettre à jour" : "Publier"}
                 </button>
+                {userReview && (
+                  <button className="btn-danger" onClick={handleDeleteReview}>Supprimer mon avis</button>
+                )}
               </div>
             </div>
           </div>

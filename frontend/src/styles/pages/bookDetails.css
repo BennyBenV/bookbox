@@ -205,3 +205,18 @@
     cursor: pointer;
   }
   
+.btn-danger{
+  border: 1px solid #c0392b;
+  background: white;
+  color: #c0392b;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  color: white;
+}

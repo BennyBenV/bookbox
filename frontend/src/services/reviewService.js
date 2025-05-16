@@ -38,3 +38,8 @@ export const updateOnlyReview = async (googleBookId, review) => {
   const res = await axios.patch(`${API}/reviews/${googleBookId}/review`, { review }, authHeaders());
   return res.data;
 };
+
+export const deleteReview = async (googleBookId) => {
+    const res = await axios.delete(`${API}/reviews/${googleBookId}`, authHeaders());
+    return res.data;
+}

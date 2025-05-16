@@ -138,3 +138,26 @@ exports.getAverageRating = async (req, res) => {
     res.status(500).json({ success: false, message: "Erreur lors du calcul de la moyenne." });
   }
 };
+
+// DELETE - Remove a user's review for a book
+exports.deleteReview = async (req, res) => {
+  try{
+    const { googleBookId } = req.params;
+    const userId = req.user?.id;
+
+    if(!googleBookId || !userId) {
+      return res.status(400).json({ success: false, message: "Missing parameters."});
+    }
+    
+    const deleted = await Review.findOneAndDelete({ googleBookId, userId });
+
+    if(!deleted){
+      return res.status(400).json({ success: false, message: "Review not found."});
+    }
+
+    res.json({ success: true, message: "Review deleted "});
+  }catch(err){
+    console.error("Erreur deleteReview:", err);
+    res.status(500).json({ success: false, message: "Erreur suppression review" });
+  }
+}

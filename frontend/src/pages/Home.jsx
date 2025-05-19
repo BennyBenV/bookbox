@@ -56,28 +56,31 @@ export default function Home() {
     if (id) navigate(`/book/${id}`);
   };
 
-  const renderBook = (book) => (
-    <li
-      key={book._id || book.googleBookId}
-      className="book-card-grid"
-      onClick={() => handleClick(book.googleBookId)}
-    >
-      {book.thumbnail ? (
-        <img
-          src={book.thumbnail.replace("http:", "https:")}
-          alt="Cover"
-          className="book-cover-sm"
-          loading="lazy"
-          width="160"
-          height="240"
-        />
-      ) : (
-        <div className="no-cover">Pas de couverture</div>
-      )}
-      <div className="book-title">{book.title}</div>
-      <div className="book-author">{book.author}</div>
-    </li>
-  );
+// 🔁 dans renderBook, gère aussi bien book.googleBookId que book.id
+const renderBook = (book) => (
+  <div
+    key={book._id || book.googleBookId || book.id}
+    className="book-card-grid"
+    onClick={() => handleClick(book.googleBookId || book.id)}
+  >
+    {book.thumbnail || book.cover ? (
+      <img
+        src={(book.thumbnail || book.cover).replace("http:", "https:")}
+        alt="Couverture"
+        loading="lazy"
+        width="160"
+        height="240"
+        className="book-cover-sm"
+      />
+    ) : (
+      <div className="no-cover">Pas de couverture</div>
+    )}
+    <div className="book-title">{book.title}</div>
+    <div className="book-author">
+      {Array.isArray(book.authors) ? book.authors[0] : book.author || "Auteur inconnu"}
+    </div>
+  </div>
+);
 
   return (
     <div className="home">
@@ -93,33 +96,9 @@ export default function Home() {
       {trending.length > 0 && (
         <div className="section">
           <h2>🔥 Livres en tendances</h2>
-          <div className="book-grid">
-            {trending.map((b) => (
-              <div
-                  key={b.googleBookId}
-                  className="book-card-grid"
-                  onClick={() => handleClick(b.googleBookId)}
-              >
-                  {b.thumbnail ? (
-                      <img
-                      src={b.thumbnail.replace("http:", "https:")}
-                      alt="Couverture"
-                      loading="lazy"
-                      width="160"
-                      height="240"
-                      className="book-cover-sm"
-                      />
-                  ) : (
-                      <div className="no-cover">Pas de couverture</div>
-                  )}
-                  <div className="book-title">{b.title}</div>
-                  <div className="book-author">{b.author}</div>
-              </div>
-              ))}
-              </div>
-          </div>
-          )}
-
+          <div className="book-grid">{trending.map(renderBook)}</div>
+        </div>
+      )}
 
       {stats && (
         <div className="section stats">
@@ -146,29 +125,10 @@ export default function Home() {
       {discover.length > 0 && (
         <div className="section discover">
           <h2>🎯 Découvrir</h2>
-          <div className="book-grid">
-            {discover.map((b, i) => (
-              <div
-                key={i}
-                className="book-card-grid"
-                onClick={() => handleClick(b.id)}
-              >
-                {b.cover && (
-                  <img
-                    src={b.cover.replace("http:", "https:")}
-                    alt="Couverture"
-                    loading="lazy"
-                    width="160"
-                    height="240"
-                  />
-                )}
-                <div className="book-title">{b.title}</div>
-                <div className="book-author">{b.authors?.join(", ")}</div>
-              </div>
-            ))}
-          </div>
+          <div className="book-grid">{discover.map(renderBook)}</div>
         </div>
       )}
+
     </div>
   );
 }

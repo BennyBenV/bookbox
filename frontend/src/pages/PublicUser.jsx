@@ -179,14 +179,18 @@ export default function PublicUser() {
         <h3>Derniers livres ajoutés</h3>
         <div className="book-grid">
           {books.slice(0, 6).map((b) => (
-            <div className="book-tile" key={b._id}>
+            <Link
+              to={`/book/${b.googleBookId}`}
+              className="book-tile"
+              key={b._id}
+            >
               <img
                 src={b.thumbnail?.replace("http:", "https:") || "/default.jpg"}
                 alt={b.title}
               />
               <p>{b.title}</p>
               <p className="book-author">{b.authors?.[0] || "Auteur inconnu"}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

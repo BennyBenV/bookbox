@@ -190,7 +190,7 @@ exports.getTrendingBooks = async (req, res) => {
           $project: {
             googleBookId: "$_id",
             title: "$bookData.title",
-            author: "$bookData.author",
+            author: "$bookData.authors",
             thumbnail: {
               $ifNull: ["$bookData.thumbnail", null]
             },

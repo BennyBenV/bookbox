@@ -21,3 +21,10 @@ export const getUserReviews = async (username) => {
     const res = await axios.get(`${API}/publicUsers/${encodeURIComponent(username)}/reviews`);
     return res.data.reviews;
 }
+
+export const searchUsers = async (query) => {
+  const res = await axios.get(`${API}/publicUsers/search`, {
+    params: { q: query }
+  });
+  return res.data;
+};

@@ -85,3 +85,19 @@ exports.getUserReviews = async (req,res) =>{
         res.status(500).json({success: false, message:"Erreur reviews"})
     }
 }
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const q = req.query.q;
+    if (!q) return res.json([]);
+
+    const users = await User.find({
+      username: { $regex: new RegExp(q, "i") },
+    }).select("username avatar");
+
+    res.json(users);
+  } catch (err) {
+    console.error("Erreur recherche utilisateur:", err);
+    res.status(500).json({ message: "Erreur lors de la recherche" });
+  }
+};

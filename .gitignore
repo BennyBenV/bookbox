@@ -4,3 +4,4 @@ backend/.env
 backend/scripts/lowercaseUsernames.js
 backend/package.json
 backend/package.json
+backend/.env

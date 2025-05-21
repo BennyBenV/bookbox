@@ -35,7 +35,7 @@ export default function Login() {
 
     return(
         <div className="auth-container">
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleLogin} className="auth-form">
                 <h2>Connexion</h2>
                 <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
                 <input type="password" placeholder="Mot de passe" onChange={(e) => setPassword(e.target.value)} required />
